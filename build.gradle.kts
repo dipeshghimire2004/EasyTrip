@@ -47,6 +47,15 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+tasks.withType<Jar>{
+    manifest {
+        attributes["Main-Class"] = "org.easytrip.backend.EasyTripBackendApplication"
+    }
+    archiveFileName.set("EasyTrip-BackendApplication.jar")
+}
+springBoot {
+    mainClass.set("com.easytrip.backend.EasyTripApplication")
+}
 tasks.withType<Test> {
     useJUnitPlatform()
 }
