@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -47,8 +49,23 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Invalid email or password",
                     content = @Content(mediaType = "application/json"))
     })
-    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
-        String token = authService.login(request);
-        return ResponseEntity.ok(token);
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest request) {
+        System.out.println("Login request received for: " + request.getEmail()); // Debug log
+        Map<String, String> tokens = authService.login(request);
+        System.out.println("generated tokens: "+tokens);
+        return ResponseEntity.ok(tokens);
+    }
+
+    @PostMapping("/refresh")
+    @Operation(summary = "Refresh access token", description = "Generates a new access token using a valid refresh token.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "New access token returned",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "401", description = "Invalid refresh token",
+                    content = @Content(mediaType = "application/json"))
+    })
+    public ResponseEntity<String> refresh(@RequestBody String refreshToken) {
+        String newAccessToken = authService.refreshToken(refreshToken);
+        return ResponseEntity.ok(newAccessToken);
     }
 }

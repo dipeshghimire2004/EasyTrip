@@ -1,26 +1,43 @@
 package org.easytrip.easytripbackend.config;
 
+import org.easytrip.easytripbackend.util.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import java.util.Collections;
 
+import java.util.Collections;
 import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 public class SecurityConfig {
+
+    private final JwtUtil jwtUtil;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(JwtUtil jwtUtil, JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtUtil = jwtUtil;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig)throws Exception {
+        return authConfig.getAuthenticationManager();
     }
 
     @Bean
@@ -35,10 +52,11 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll() // Public Swagger access
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/hotel/**").hasRole("HOTEL_MANAGER")
+                        .requestMatchers("api/guesthouses/**").hasAnyRole("HOTEL_MANAGER", "ADMIN")
                         .requestMatchers("/api/client/**").hasRole("CLIENT")
                         .anyRequest().authenticated() // All other endpoints require authentication
-                );
-
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
@@ -51,7 +69,7 @@ public class SecurityConfig {
         configuration.setAllowCredentials(true); // Allow credentials
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // Apply to all paths
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 }

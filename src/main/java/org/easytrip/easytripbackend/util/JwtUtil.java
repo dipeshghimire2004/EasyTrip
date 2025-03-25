@@ -1,5 +1,6 @@
 package org.easytrip.easytripbackend.util;
 
+//import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -22,6 +23,9 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private Long expiration;
 
+    @Value("${jwt.refresh.expiration}")
+    private Long refreshExpiration;
+
 //    convert the secret string to secret key
     private SecretKey getSecretKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());
@@ -38,10 +42,27 @@ public class JwtUtil {
                 .signWith(getSecretKey(),SignatureAlgorithm.HS512).
                 compact();
     }
+
+    public String generateRefreshToken(String email) {
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(Date.from(Instant.now()))
+                .setExpiration(Date.from(Instant.now().plusMillis(refreshExpiration)))
+                .signWith(getSecretKey(), SignatureAlgorithm.HS512)
+                .compact();
+    }
     public String extractEmail(String token){
         return Jwts.parserBuilder().setSigningKey(getSecretKey()).build().parseClaimsJws(token).getBody().getSubject();
     }
 
+    public Set<String> extractRoles(String token){
+        return (Set<String>) Jwts.parserBuilder()
+                .setSigningKey(getSecretKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("roles");
+    }
     public boolean validateToken(String token){
         try{
             Jwts.parserBuilder().setSigningKey(getSecretKey()).build().parseClaimsJws(token);
@@ -50,6 +71,15 @@ public class JwtUtil {
         catch(Exception e){
             return false;
         }
+    }
+
+    public String refreshAccessToken(String refreshToken){
+        if(validateToken(refreshToken)){
+            String email = extractEmail(refreshToken);
+            Set<String> roles = extractRoles(refreshToken);
+            return generateToken(email, roles);
+        }
+        throw new RuntimeException("Invalid refresh token");
     }
 }
 

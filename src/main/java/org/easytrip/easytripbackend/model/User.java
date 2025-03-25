@@ -33,4 +33,11 @@ public class User {
     @CollectionTable(name="user_roles", joinColumns=@JoinColumn(name="user_id"))
     @Column(name="role")
     private Set<Role> roles =new HashSet<>();
+
+    @OneToMany(mappedBy="owner", cascade= CascadeType.ALL, orphanRemoval=true)
+    private Set<Guesthouse> guesthouses =new HashSet<>();
+
+    //one-to-many relationship with bookings(for travellers/client)
+    @OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
+    private Set<Booking> bookings;
 }
