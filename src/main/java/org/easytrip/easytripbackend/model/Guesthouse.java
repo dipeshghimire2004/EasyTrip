@@ -20,12 +20,8 @@ public class Guesthouse {
     @Column(nullable = false)
     private String contactDetails;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="owner_id", nullable=false)
-    private User owner;
-
     private String description;
-    private String aminities;   // Could be a JSON or separate table later
+    private String amenities;   // Could be a JSON or separate table later
 
     @Column(nullable=false)
     private String verifiedDocument;
@@ -34,6 +30,7 @@ public class Guesthouse {
     @Column(nullable = false)
     private GuesthouseApprovalStatus status = GuesthouseApprovalStatus.PENDING;
 
-//    @Column(nullable=false)
-//    private boolean isApproved=false;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="owner_id", nullable=false)
+    private User owner;
 }

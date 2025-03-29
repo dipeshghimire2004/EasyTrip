@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Schema(description="Request body for user registration")
 public class RegisterRequest {
@@ -27,4 +29,6 @@ public class RegisterRequest {
     @Size(min = 6, max = 16)
     @Schema(description = "Password confirmation", example = "password123")
     private String confirmPassword;
+
+    private String role;
 }

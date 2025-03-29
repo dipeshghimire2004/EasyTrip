@@ -30,9 +30,9 @@ public class User {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
-    @CollectionTable(name="user_roles", joinColumns=@JoinColumn(name="user_id"))
+    @CollectionTable(name="user_role", joinColumns=@JoinColumn(name="user_id"))
     @Column(name="role")
-    private Set<Role> roles =new HashSet<>();
+    private Set<Role> role =new HashSet<>();
 
     @OneToMany(mappedBy="owner", cascade= CascadeType.ALL, orphanRemoval=true)
     private Set<Guesthouse> guesthouses =new HashSet<>();

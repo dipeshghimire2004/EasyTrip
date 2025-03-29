@@ -1,6 +1,8 @@
 package org.easytrip.easytripbackend.util;
 
 //import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -9,10 +11,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class JwtUtil {
@@ -55,13 +54,23 @@ public class JwtUtil {
         return Jwts.parserBuilder().setSigningKey(getSecretKey()).build().parseClaimsJws(token).getBody().getSubject();
     }
 
-    public Set<String> extractRoles(String token){
-        return (Set<String>) Jwts.parserBuilder()
-                .setSigningKey(getSecretKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .get("roles");
+    public Set<String> extractRoles(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(getSecretKey())
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            Object roles = claims.get("roles");
+            if (roles instanceof List<?>) {
+                return new HashSet<>((List<String>) roles);
+            }
+            return Collections.emptySet(); // Return empty set if no roles found
+        } catch (JwtException e) {
+            // Handle invalid token (e.g., expired, tampered)
+            e.printStackTrace();
+            return Collections.emptySet();
+        }
     }
     public boolean validateToken(String token){
         try{

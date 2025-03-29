@@ -47,14 +47,14 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless session
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // Public access to /api/auth/**
-                        .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll() // Public Swagger access
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/hotel/**").hasRole("HOTEL_MANAGER")
-                        .requestMatchers("api/guesthouses/**").hasAnyRole("HOTEL_MANAGER", "ADMIN")
-                        .requestMatchers("/api/client/**").hasRole("CLIENT")
-                        .anyRequest().authenticated() // All other endpoints require authentication
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll()
+//                        .requestMatchers("/api/auth/**").permitAll() // Public access to /api/auth/**
+//                        .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll() // Public Swagger access
+//                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+//                        .requestMatchers("/api/hotel/**").hasRole("HOTEL_MANAGER")
+//                        .requestMatchers("/api/guesthouses/**").hasRole("HOTEL_MANAGER")
+//                        .requestMatchers("/api/client/**").hasRole("CLIENT")
+//                        .anyRequest().authenticated() // All other endpoints require authentication
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

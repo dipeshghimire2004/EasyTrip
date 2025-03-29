@@ -15,17 +15,27 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private LocalDateTime startDate; // Booking start date/time
+
+    @Column(nullable = false)
+    private LocalDateTime endDate; // Booking end date/time
+
+    @Column(nullable = false)
+    private String status; // e.g., "CONFIRMED", "CANCELLED"
+
     @ManyToOne
     @JoinColumn(name="user_id", nullable=false)
-    private User traveller;
+    private User user;
 
-    @ManyToOne
-    @JoinColumn(name="room_id", nullable=false)
-    private Room room;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="gueshhouse_id", nullable=false)
+    private Guesthouse guesthouse;
 
-    @Column(nullable=false)
-    private LocalDateTime checkOutTime;
-
-
-
+//    @ManyToOne
+//    @JoinColumn(name="room_id", nullable=false)
+//    private Room room;
+//
+//    @Column(nullable=false)
+//    private LocalDateTime checkOutTime;
 }

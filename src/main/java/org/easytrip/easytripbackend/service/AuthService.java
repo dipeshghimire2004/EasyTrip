@@ -14,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,7 +45,19 @@ public class AuthService {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRoles(Collections.singleton(Role.CLIENT));
+        // Use the role from the DTO, with a default fallback
+        // Convert String role to Set<Role>
+        String roleStr = request.getRole() != null ? request.getRole().trim() : "CLIENT";
+        System.out.println("Requested role: '" + roleStr + "'"); // Debug
+        System.out.println("Available roles: " + Arrays.toString(Role.values())); // Debug
+
+        Role role;
+        try {
+            role = Role.valueOf(roleStr);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid role: " + roleStr + ". Available roles: " + Arrays.toString(Role.values()));
+        }
+        user.setRole(Collections.singleton(role)); // Set as Set<Role>
 
         logger.info("User registered Successfully: {}", user.getEmail() );
         return userRepository.save(user);
@@ -65,9 +74,9 @@ public class AuthService {
         logger.error("Invalid password for email: {}", request.getEmail());
         throw new InvalidCredentialsException("Passwords do not match");
     }
-    Set<String> roles = user.getRoles().stream().map(Enum::name).collect(Collectors.toSet());
+    Set<String> role = user.getRole().stream().map(Enum::name).collect(Collectors.toSet());
         Map<String, String> tokens= new HashMap<>();
-        tokens.put("accessToken", jwtUtil.generateToken(user.getEmail(), roles));
+        tokens.put("accessToken", jwtUtil.generateToken(user.getEmail(), role));
         tokens.put("refreshToken", jwtUtil.generateRefreshToken(user.getEmail()));
         logger.info("Login successful for email: {}", request.getEmail());
         return tokens;
