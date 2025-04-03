@@ -116,11 +116,12 @@ public class GuesthouseService {
         logger.info("Searching guesthouses by location: {} and name: {}", location, name);
         List<Guesthouse> guesthouses;
         guesthouses= guesthouseRepository.findByStatus(GuesthouseApprovalStatus.APPROVED);
-        if(location!= null || !location.isEmpty()){
+        if(location!= null && !location.isEmpty()){
             guesthouses =guesthouses.stream().
                     filter(g -> g.getLocation().equalsIgnoreCase(location)).collect(Collectors.toList());
+
         }
-        if(name!= null || !name.isEmpty()){
+        if(name!= null && !name.isEmpty()){
             guesthouses = guesthouses.stream()
                     .filter(g -> g.getName().toLowerCase().contains(name.toLowerCase()))
             .collect(Collectors.toList());

@@ -40,4 +40,7 @@ public class User {
     //one-to-many relationship with bookings(for travellers/client)
     @OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
     private Set<Booking> bookings;
+
+    @Column(nullable=false)
+    private boolean isActive=true;
 }

@@ -3,6 +3,7 @@ package org.easytrip.easytripbackend.service;
 import org.easytrip.easytripbackend.dto.LoginRequest;
 import org.easytrip.easytripbackend.dto.RegisterRequest;
 import org.easytrip.easytripbackend.exception.InvalidCredentialsException;
+import org.easytrip.easytripbackend.exception.UnauthorizedRoleException;
 import org.easytrip.easytripbackend.exception.UserNotFoundException;
 import org.easytrip.easytripbackend.model.Role;
 import org.easytrip.easytripbackend.model.User;
@@ -87,5 +88,28 @@ public class AuthService {
         String newToken = jwtUtil.refreshAccessToken(refreshToken);
         logger.info("Refresh token successful");
         return newToken;
+    }
+
+
+    public void deactivateUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException("User not found"));
+        if (user.getRole().contains(Role.ADMIN)) {
+            throw new RuntimeException("Cannot deactivate an admin user");
+        }
+        user.setActive(false);
+        userRepository.save(user);
+    }
+
+    public void activateUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException("User not found"));
+        user.setActive(true);
+    }
+
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+    public List<User> getActiveUsers(boolean isActive) {
+        return userRepository.findByIsActive(isActive);
     }
 }

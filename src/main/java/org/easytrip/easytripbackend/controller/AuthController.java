@@ -29,12 +29,12 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/register")
-    @Operation(summary="Register a new User", description="Creates a new user account with name, email, and password. Default role is client.")
-    @ApiResponses(value={
-        @ApiResponse(responseCode="200", description="User registered successfully",
-        content=@Content(mediaType="application/json", schema=@Schema(implementation=User.class))),
-            @ApiResponse(responseCode="400", description="invalid input(e.g., passwords don’t match or email exists)",
-                    content = @Content(mediaType = "application/json"))
+        @Operation(summary="Register a new User", description="Creates a new user account with name, email, and password. Default role is client.")
+        @ApiResponses(value={
+            @ApiResponse(responseCode="200", description="User registered successfully",
+            content=@Content(mediaType="application/json", schema=@Schema(implementation=User.class))),
+                @ApiResponse(responseCode="400", description="invalid input(e.g., passwords don’t match or email exists)",
+                        content = @Content(mediaType = "application/json"))
     })
     public ResponseEntity<User> register(@RequestBody RegisterRequest request) {
         User user = authService.register(request);

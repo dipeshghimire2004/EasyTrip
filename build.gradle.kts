@@ -31,7 +31,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-devtools:3.4.4")
 
     //swagger
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4")
 
     //JWR for authentication
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -29,6 +30,8 @@ public class RegisterRequest {
     @Size(min = 6, max = 16)
     @Schema(description = "Password confirmation", example = "password123")
     private String confirmPassword;
+
+    private LocalDateTime registrationDate;
 
     private String role;
 }

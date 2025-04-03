@@ -44,7 +44,7 @@ public class GuesthouseController {
     }
 
     // ADMIN fetches all pending guesthouses
-    @GetMapping("/admin/guesthouses/pending")
+    @GetMapping("/admin/pending")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get all pending guesthouses")
     @ApiResponse(responseCode = "200", description = "List of pending guesthouses")
@@ -54,7 +54,7 @@ public class GuesthouseController {
     }
 
     // ADMIN fetches a specific guesthouse by ID
-    @GetMapping("/admin/guesthouses/{id}")
+    @GetMapping("/admin/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get guesthouse by ID")
     @ApiResponse(responseCode = "200", description = "Guesthouse details")
@@ -86,6 +86,15 @@ public class GuesthouseController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GuesthouseResponseDTO> reject(@PathVariable("id") Long id){
         GuesthouseResponseDTO response= guesthouseService.rejectGuesthouse(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("search")
+    @Operation(summary="Search guesthouses", description="Filter guesthouses by name or location")
+    @ApiResponse(responseCode="200", description="List of matching guesthouses")
+    public ResponseEntity<List<GuesthouseResponseDTO>> searchGuesthouses(@RequestParam(required=false) String name,
+                                                              @RequestParam(required=false) String location) {
+        List<GuesthouseResponseDTO> response = guesthouseService.searchGuesthouses(name, location);
         return ResponseEntity.ok(response);
     }
 
