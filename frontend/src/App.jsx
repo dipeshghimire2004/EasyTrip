@@ -8,6 +8,7 @@ import AdminPanel from './components/AdminPanel/AdminPanel';
 import Home from "./components/Home/Home";
 import AboutUs from "./components/AboutUs/AboutUs"
 import AddGuestHouseForm from "./components/HotelManagerPanel/AddGuesthouse/AddGuestHouseForm";
+import Contact from "./components/Contact/Contact";
 
 function ProtectedRoute({ element, userRole, allowedRoles }) {
   if (!allowedRoles.includes(userRole)) {
@@ -27,6 +28,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/booking" element={<HotelBookingUI />} />
         <Route path="/about" element={<AboutUs />} />
+        <Route path="/contact" element={<Contact />} />
 
         {/* User Routes */}
         <Route path="/CLIENT/signup" element={<Signup role="CLIENT" />} />
