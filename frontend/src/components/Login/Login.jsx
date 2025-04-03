@@ -1,7 +1,8 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import api from "../API/api";
 
-export default function Login() {
+export default function Login({ role = "CLIENT", setUserRole }) { // Accept setUserRole as prop
   const {
     register,
     handleSubmit,
@@ -10,17 +11,39 @@ export default function Login() {
   const navigate = useNavigate();
 
   const onSubmit = (data) => {
-    alert(`Logging in with: ${data.email}`);
-    // Add your login logic here.
+    const loginData = {
+      email: data.email,
+      password: data.password
+    };
+    alert(`Logging in as ${role} with email: ${data.email}`);
+
+    // Set the user role when login is successful
+    setUserRole(role);  
+
+    api.post("/api/auth/login", loginData)
+      .then(response => {
+        console.log("Login successful:", response.data);
+        if (role === "ADMIN") {
+          navigate("/ADMIN/panel");
+        } else if (role === "HOTEL_MANAGER") {
+          navigate("/HOTEL_MANAGER/addGuestHouse");
+        } else {
+          navigate("/booking");
+        }
+      })
+      .catch(error => {
+        console.error("Login error:", error.response?.data || error.message);
+      });
+    
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      {/* Container with relative positioning and fixed height */}
       <div className="relative w-3/4 max-w-4xl h-[500px]">
-        {/* Form Section on Left */}
         <div className="absolute top-0 left-0 w-1/2 h-full p-10">
-          <h2 className="text-3xl font-bold text-gray-800 text-center">Login</h2>
+          <h2 className="text-3xl font-bold text-gray-800 text-center">
+            {role.charAt(0).toUpperCase() + role.slice(1)} Login
+          </h2>
           <form className="mt-6" onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700">
@@ -51,10 +74,8 @@ export default function Login() {
                 {...register("password", {
                   required: "Password is required",
                   pattern: {
-                    value:
-                      /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/,
-                    message:
-                      "Must be at least 6 characters and contain a number",
+                    value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/,
+                    message: "Must be at least 6 characters and contain a number",
                   },
                 })}
                 className="w-full p-3 border rounded-lg mt-1 focus:ring-2 focus:ring-green-500"
@@ -72,18 +93,18 @@ export default function Login() {
               Login
             </button>
           </form>
-          <p className="mt-6 text-sm text-center">
-            Don't have an account?{" "}
-            <a
-              href="/"
-              className="text-green-600 font-semibold hover:underline"
-            >
-              Sign Up Here
-            </a>
-          </p>
+          {role !== "ADMIN" && (
+            <p className="mt-6 text-sm text-center">
+              Don't have an account?{" "}
+              <a
+                href={`/${role}/signup`}
+                className="text-green-600 font-semibold hover:underline"
+              >
+                Sign Up Here
+              </a>
+            </p>
+          )}
         </div>
-
-        {/* Overlay Section on Right */}
         <div className="absolute top-0 right-0 w-1/2 h-full p-10 bg-gradient-to-r from-black to-gray-800 text-white flex flex-col justify-center rounded-2xl">
           <div className="bg-white bg-opacity-30 backdrop-blur-lg p-10 rounded-2xl">
             <h2 className="text-3xl font-bold">Welcome Back</h2>

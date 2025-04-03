@@ -1,7 +1,9 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import api from "../API/api";
 
-export default function Signup() {
+
+export default function Signup({ role = "CLIENT" }) {
   const {
     register,
     handleSubmit,
@@ -11,10 +13,29 @@ export default function Signup() {
   const navigate = useNavigate();
   const password = watch("password");
 
+
   const onSubmit = (data) => {
-    alert(`Signing up with: ${data.email}`);
-    navigate("/login");
+    const signupData = {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      confirmPassword: data.confirmPassword,
+      role: role, // Ensure role is included as a string
+    };
+  
+    console.log(signupData); // Check format in console
+  
+    // Send data to the backend via Axios
+    api.post("api/auth/register", signupData)
+      .then(response => {
+        console.log("Signup successful:", response.data);
+        navigate(`/${role}/login`);
+      })
+      .catch(error => {
+        console.error("Signup error:", error.response?.data || error.message);
+      });
   };
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -33,7 +54,7 @@ export default function Signup() {
         {/* Form Section on Right */}
         <div className="absolute top-0 right-0 w-1/2 h-full p-8 flex flex-col justify-center">
           <h2 className="text-2xl font-bold text-gray-800 text-center">
-            Create Account
+            {role.charAt(0).toUpperCase() + role.slice(1)} Signup
           </h2>
           <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-3">
@@ -78,7 +99,8 @@ export default function Signup() {
                   required: "Password is required",
                   pattern: {
                     value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/,
-                    message: "Must be at least 6 characters and contain a number",
+                    message:
+                      "Must be at least 6 characters and contain a number",
                   },
                 })}
                 className="w-full p-2 border rounded-lg mt-1 focus:ring-2 focus:ring-green-500"
@@ -118,7 +140,7 @@ export default function Signup() {
           <p className="mt-4 text-xs text-center">
             Already have an account?{" "}
             <a
-              href="/login"
+              href={`/${role}/login`}
               className="text-green-600 font-semibold hover:underline"
             >
               Login Here
