@@ -54,8 +54,10 @@ public class GuesthouseService {
         guestHouse.setLocation(requestDTO.getLocation());
         guestHouse.setContactDetails(requestDTO.getContactDetails());
         guestHouse.setDescription(requestDTO.getDescription());
+        guestHouse.setAmenities(requestDTO.getAmenities());
         guestHouse.setVerifiedDocument(documentPath);
         guestHouse.setOwner(owner);
+        guestHouse.setPricePerNight(requestDTO.getPricePerNight());
 
         Guesthouse savedGuestHouse = guesthouseRepository.save(guestHouse);
         logger.info("Guesthouse registered with ID: {}", savedGuestHouse.getId());
@@ -111,6 +113,10 @@ public class GuesthouseService {
         return guesthouseRepository.findById(guesthouseId)
                 .orElseThrow(() -> new RuntimeException("Guesthouse not found"));
     }
+    public Guesthouse getGuesthouseEntityById(Long guesthouseId) {
+        return guesthouseRepository.findById(guesthouseId)
+                .orElseThrow(() -> new RuntimeException("Guesthouse not found"));
+    }
 
     public List<GuesthouseResponseDTO> searchGuesthouses(String location, String name) {
         logger.info("Searching guesthouses by location: {} and name: {}", location, name);
@@ -140,7 +146,9 @@ public class GuesthouseService {
         responseDTO.setContactDetails(guestHouse.getContactDetails());
         responseDTO.setVerifiedDocument(guestHouse.getVerifiedDocument());
         responseDTO.setDescription(guestHouse.getDescription());
+        responseDTO.setAmenities(guestHouse.getAmenities());
         responseDTO.setStatus(guestHouse.getStatus().name());
+        responseDTO.setPricePerNight(guestHouse.getPricePerNight());
         return responseDTO;
     }
 }

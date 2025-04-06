@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "bookings")
@@ -15,22 +15,27 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private LocalDateTime startDate; // Booking start date/time
+    @ManyToOne
+    @JoinColumn(name="user_id", nullable=false)
+    private User traveler;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="guesthouse_id", nullable=false)
+    private Guesthouse guesthouse;
 
     @Column(nullable = false)
-    private LocalDateTime endDate; // Booking end date/time
+    private LocalDate checkInDate;
+
+    @Column(nullable = false)
+    private LocalDate checkOutDate;
 
     @Column(nullable = false)
     private String status; // e.g., "CONFIRMED", "CANCELLED"
 
-    @ManyToOne
-    @JoinColumn(name="user_id", nullable=false)
-    private User user;
+    @Column(nullable = false)
+    private double totalPrice;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="gueshhouse_id", nullable=false)
-    private Guesthouse guesthouse;
+
 
 //    @ManyToOne
 //    @JoinColumn(name="room_id", nullable=false)

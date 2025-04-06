@@ -38,7 +38,7 @@ public class User {
     private Set<Guesthouse> guesthouses =new HashSet<>();
 
     //one-to-many relationship with bookings(for travellers/client)
-    @OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
+    @OneToMany(mappedBy="traveler", cascade=CascadeType.ALL, orphanRemoval=true)
     private Set<Booking> bookings;
 
     @Column(nullable=false)

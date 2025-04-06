@@ -31,6 +31,7 @@ public class GuesthouseRequestDTO {
     @NotBlank
     private Long ownerId;
     private String description;
-    private String aminities;
+    private String amenities;
+    private double pricePerNight;
 
 }

@@ -2,6 +2,7 @@ package org.easytrip.easytripbackend.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.easytrip.easytripbackend.dto.GuesthouseRequestDTO;
 import org.easytrip.easytripbackend.dto.GuesthouseResponseDTO;
@@ -21,8 +22,8 @@ import java.io.File;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/guesthouses")
-@Tag(name = "Guesthouse", description = "API for guesthouse management")
+@RequestMapping("/api/guesthouses")
+@Tag(name = "Guesthouse API", description = "API for guesthouse management")
 public class GuesthouseController {
 
     @Autowired
@@ -37,7 +38,10 @@ public class GuesthouseController {
     @PostMapping
     @PreAuthorize("hasRole('HOTEL_MANAGER')")
     @Operation(summary="Register a new guesthouse", description="Allows a HOTEL_MANAGER to register their guesthouse")
-    @ApiResponse(responseCode = "200", description = "Guesthouse registered successfully")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Guesthouse registered successfully"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - Requires HOTEL_MANAGER role")
+    })
     public ResponseEntity<GuesthouseResponseDTO> register(@ModelAttribute GuesthouseRequestDTO request) {
         GuesthouseResponseDTO response= guesthouseService.registerGuesthouse(request);
         return ResponseEntity.ok(response);

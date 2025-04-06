@@ -112,4 +112,8 @@ public class AuthService {
     public List<User> getActiveUsers(boolean isActive) {
         return userRepository.findByIsActive(isActive);
     }
+
+    public User findByUserId(Long userId) {
+        return userRepository.findById(userId).orElseThrow(()->new UserNotFoundException("User not found"));
+    }
 }
