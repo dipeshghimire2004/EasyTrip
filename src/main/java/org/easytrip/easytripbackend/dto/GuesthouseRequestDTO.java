@@ -28,8 +28,8 @@ public class GuesthouseRequestDTO {
     @Schema(description = "Verification document (PDF/image)", type = "string", format = "binary")
     private MultipartFile verifiedDocument;
 
-    @NotBlank
-    private Long ownerId;
+//    @NotBlank
+//    private Long ownerId;
     private String description;
     private String amenities;
     private double pricePerNight;

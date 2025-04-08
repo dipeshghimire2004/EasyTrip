@@ -11,6 +11,8 @@ import org.easytrip.easytripbackend.model.User;
 import org.easytrip.easytripbackend.repository.BookingRepository;
 import org.easytrip.easytripbackend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -50,7 +52,24 @@ public class BookingService {
     }
 
     public BookingResponseDTO bookGuesthouse(BookingRequestDTO request) {
-        User traveler = authService.findByUserId(request.getUserId());
+        // Get the authenticated user (traveler)
+        Authentication auth= SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        User traveler= authService.findByEmail(email);
+
+
+        //validate dates
+        if(request.getCheckInDate().isBefore(LocalDate.now())) {
+            throw new RuntimeException("CheckInDate must be after this recent time");
+        }
+        if(request.getCheckInDate().isAfter(request.getCheckOutDate())) {
+            throw new RuntimeException("CheckOutDate must be after this recent time");
+        }
+
+
+
+
+//        User traveler = authService.findByUserId(request.getUserId());
         if(!traveler.getRole().contains(Role.CLIENT)) {
             throw new RuntimeException("You are not the client/traveller of this traveler");
         }
@@ -83,9 +102,10 @@ public class BookingService {
 
     private BookingResponseDTO mapToResponseDto(Booking booking) {
         BookingResponseDTO bookingResponseDTO = new BookingResponseDTO();
-        bookingResponseDTO.setId(booking.getId());
-        bookingResponseDTO.setUserId(booking.getTraveler().getId());
+        bookingResponseDTO.setBookingId(booking.getId());
+//        bookingResponseDTO.setTraveler(booking.getTraveler().getId());
         bookingResponseDTO.setGuesthouseId(booking.getGuesthouse().getId());
+        bookingResponseDTO.setGuesthouseName(booking.getGuesthouse().getName());
         bookingResponseDTO.setCheckInDate(booking.getCheckInDate());
         bookingResponseDTO.setCheckOutDate(booking.getCheckOutDate());
         bookingResponseDTO.setTotalPrice(booking.getTotalPrice());

@@ -28,41 +28,55 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-    throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain chain) throws ServletException, IOException {
+
         String path = request.getRequestURI();
-        logger.info("Processing request: {} " , path);
+        logger.info("Processing request: {}", path);
+
+        // Skip filter for public endpoints
         if (path.startsWith("/api/auth/") || path.startsWith("/swagger-ui/") || path.startsWith("/api-docs")) {
-            logger.debug("Skipping JWT filter for: {}", path);
             chain.doFilter(request, response);
             return;
         }
 
-//
+        try {
+            String header = request.getHeader("Authorization");
+            if (header != null && header.startsWith("Bearer ")) {
+                String token = header.substring(7);
+                logger.debug("JWT Token: {}", token); // Add this for debugging
 
+                if (jwtUtil.validateToken(token)) {
+                    String email = jwtUtil.extractEmail(token);
+                    Set<String> roles = jwtUtil.extractRoles(token);
+                    logger.debug("Authenticating user: {} with roles: {}", email, roles);
 
-        String header = request.getHeader("Authorization");
-        if(header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
-            if(jwtUtil.validateToken(token)) {
-                String email = jwtUtil.extractEmail(token);
-                Set<String> roles = jwtUtil.extractRoles(token);
-
-                if(email !=null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            email,
-                            null,
-                            roles.stream().map(role-> new SimpleGrantedAuthority("ROLE_"+ role)).collect(Collectors.toList())
-                    );
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                    logger.debug("Successfully authenticated user: {}", email);
+                    if (email != null) {
+                        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                                email,
+                                null,
+                                roles.stream()
+                                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                                        .collect(Collectors.toList())
+                        );
+                        auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                    }
+                } else {
+                    logger.error("Invalid JWT token");
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT Token");
+                    return;
                 }
-                else {
-                    logger.error("Invalid JWT token for request: {} " , path);
-                }
+            } else {
+                logger.warn("No JWT token found");
             }
+        } catch (Exception ex) {
+            logger.error("Failed to process JWT token", ex);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed");
+            return;
         }
+
         chain.doFilter(request, response);
     }
 }

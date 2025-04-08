@@ -23,15 +23,12 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
 
     //lombok
-    // https://mvnrepository.com/artifact/org.projectlombok/lombok
     implementation("org.projectlombok:lombok:1.18.34") // Check for latest version if needed
     annotationProcessor("org.projectlombok:lombok:1.18.34")
 
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-devtools
     implementation("org.springframework.boot:spring-boot-devtools:3.4.4")
 
     //swagger
-    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4")
 
     //JWR for authentication
@@ -40,13 +37,10 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
     // Logging with SLF4J and Logback
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-logging
     implementation("org.springframework.boot:spring-boot-starter-logging:3.4.4")
 
     //security and validation
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
     implementation("org.springframework.boot:spring-boot-starter-security:3.4.4")
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
     implementation("org.springframework.boot:spring-boot-starter-validation:3.4.4")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")

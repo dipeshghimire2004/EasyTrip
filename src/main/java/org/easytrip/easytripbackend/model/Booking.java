@@ -1,5 +1,6 @@
 package org.easytrip.easytripbackend.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
@@ -23,24 +24,20 @@ public class Booking {
     @JoinColumn(name="guesthouse_id", nullable=false)
     private Guesthouse guesthouse;
 
-    @Column(nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "check_in_date", nullable = false)
     private LocalDate checkInDate;
 
-    @Column(nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "check_out_date", nullable = false)
     private LocalDate checkOutDate;
-
-    @Column(nullable = false)
-    private String status; // e.g., "CONFIRMED", "CANCELLED"
 
     @Column(nullable = false)
     private double totalPrice;
 
+    @Column(nullable = false)
+    private String paymentOption = "Cash on Arrival"; // Default for Sprint 1
 
-
-//    @ManyToOne
-//    @JoinColumn(name="room_id", nullable=false)
-//    private Room room;
-//
-//    @Column(nullable=false)
-//    private LocalDateTime checkOutTime;
+    @Column(nullable = false)
+    private String status = "Confirmed";// e.g., "CONFIRMED", "CANCELLED"
 }

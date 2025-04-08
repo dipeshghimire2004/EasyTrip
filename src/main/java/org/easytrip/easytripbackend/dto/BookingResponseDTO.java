@@ -3,6 +3,7 @@ package org.easytrip.easytripbackend.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.easytrip.easytripbackend.model.User;
 
 import java.time.LocalDate;
 
@@ -10,12 +11,13 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookingResponseDTO {
-    private Long id;
-    private Long userId;
+    private Long bookingId;
     private Long guesthouseId;
+    private User traveler;
+    private String guesthouseName;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
-    private String status;
     private double totalPrice;
-
+    private String paymentOption; // e.g., "Cash on Arrival"
+    private String status;
 }

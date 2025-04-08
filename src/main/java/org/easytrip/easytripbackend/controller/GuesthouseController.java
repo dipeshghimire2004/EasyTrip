@@ -16,6 +16,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
@@ -35,7 +36,15 @@ public class GuesthouseController {
     @Autowired
     private FileStorageService fileStorageService;
 
-    @PostMapping
+    @GetMapping("/api/test-auth")
+    @PreAuthorize("hasRole('HOTEL_MANAGER')")
+    public String testAuth() {
+      String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return "Authenticated as: " + email;
+    }
+
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('HOTEL_MANAGER')")
     @Operation(summary="Register a new guesthouse", description="Allows a HOTEL_MANAGER to register their guesthouse")
     @ApiResponses(value = {
