@@ -20,12 +20,12 @@ export default function Signup({ role = "CLIENT" }) {
       email: data.email,
       password: data.password,
       confirmPassword: data.confirmPassword,
-      role: role, // Ensure role is included as a string
+      registrationDate: new Date().toISOString(), // Add current timestamp
+      role: role, // Role stays as string
     };
   
-    console.log(signupData); // Check format in console
+    console.log(signupData);
   
-    // Send data to the backend via Axios
     api.post("api/auth/register", signupData)
       .then(response => {
         console.log("Signup successful:", response.data);
@@ -35,6 +35,7 @@ export default function Signup({ role = "CLIENT" }) {
         console.error("Signup error:", error.response?.data || error.message);
       });
   };
+  
 
 
   return (

@@ -1,16 +1,19 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useState } from "react";
 import Signup from "./components/SignUp/signup";
-import Login from "./components/Login/login";
+import Login from "./components/Login/Login";
 import HotelBookingUI from "./components/Booking/BookingApp";
-import Payment from './components/ClientPanel/Payment/payment';
+import Payment from './components/ClientPanel/Payment/Payment';
 import AdminPanel from './components/AdminPanel/AdminPanel';
 import Home from "./components/Home/Home";
 import AboutUs from "./components/AboutUs/AboutUs"
 import AddGuestHouseForm from "./components/HotelManagerPanel/AddGuesthouse/AddGuestHouseForm";
+import Contact from "./components/Contact/Contact";
+import GuestHouseOverview from "./components/HotelManagerPanel/GuestHouseOverview/GuestHouseOverview";
 
 function ProtectedRoute({ element, userRole, allowedRoles }) {
   if (!allowedRoles.includes(userRole)) {
+    // alert(`Login as ${allowedRoles.join(", ")} user to access this page`); 
     alert("Login as user to access this page"); // Show alert before redirecting
     return <Navigate to="/" />;
   }
@@ -18,7 +21,10 @@ function ProtectedRoute({ element, userRole, allowedRoles }) {
 }
 
 function App() {
-  const [userRole, setUserRole] = useState(null); // Track user role
+  const [userRole, setUserRole] = useState(() => {
+    // Read initial role from localStorage
+    return localStorage.getItem("userRole") || null;
+  });
 
   return (
     <Router>
@@ -27,6 +33,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/booking" element={<HotelBookingUI />} />
         <Route path="/about" element={<AboutUs />} />
+        <Route path="/contact" element={<Contact />} />
 
         {/* User Routes */}
         <Route path="/CLIENT/signup" element={<Signup role="CLIENT" />} />
@@ -41,6 +48,7 @@ function App() {
         <Route path="/HOTEL_MANAGER/signup" element={<Signup role="HOTEL_MANAGER" />} />
         <Route path="/HOTEL_MANAGER/login" element={<Login role="HOTEL_MANAGER" setUserRole={setUserRole} />} />
         <Route path="/HOTEL_MANAGER/addGuestHouse" element={<ProtectedRoute element={<AddGuestHouseForm />} userRole={userRole} allowedRoles={["HOTEL_MANAGER"]} />} />
+        <Route path="/HOTEL_MANAGER/guestHouseOverview" element={<ProtectedRoute element={<GuestHouseOverview />} userRole={userRole} allowedRoles={["HOTEL_MANAGER"]} />} />
       </Routes>
     </Router>
   );

@@ -17,7 +17,9 @@ const HeroSection = () => {
           <Link to="/booking">
               <button className="bg-blue-500 text-white px-4 py-2 rounded">Find Guesthouses</button>
           </Link>
-          <button className="bg-green-500 text-white px-4 py-2 rounded">List Your Guesthouse</button>
+          <Link to="/HOTEL_MANAGER/addGuestHouse">
+            <button className="bg-green-500 text-white px-4 py-2 rounded">List Your Guesthouse</button>
+          </Link>
         </div>
       </div>
   );
