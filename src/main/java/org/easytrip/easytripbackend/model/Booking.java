@@ -39,5 +39,5 @@ public class Booking {
     private String paymentOption = "Cash on Arrival"; // Default for Sprint 1
 
     @Column(nullable = false)
-    private String status = "Confirmed";// e.g., "CONFIRMED", "CANCELLED"
+    private String status ="CONFIRMED";// e.g., "CONFIRMED", "CANCELLED"
 }

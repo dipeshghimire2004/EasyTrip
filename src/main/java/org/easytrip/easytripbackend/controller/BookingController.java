@@ -29,16 +29,16 @@ public class BookingController {
     @Autowired
     private BookingService bookingService;
 
-    @GetMapping("/calculate")
-    @Operation(summary = "Calculate booking price", description = "Calculates the total price and displays payment options.")
-    public ResponseEntity<BookingPriceResponseDTO> calculateBookingPrice(
-            @Parameter(description = "ID of the guesthouse") @RequestParam Long guesthouseId,
-            @Parameter(description = "Check-in date (yyyy-MM-dd)") @RequestParam String checkInDate,
-            @Parameter(description = "Check-out date (yyyy-MM-dd)") @RequestParam String checkOutDate) {
-
-        BookingPriceResponseDTO response =bookingService.calculateBookingPrice(guesthouseId, checkInDate, checkOutDate);
-        return ResponseEntity.ok(response);
-    }
+//    @GetMapping("/calculate")
+//    @Operation(summary = "Calculate booking price", description = "Calculates the total price and displays payment options.")
+//    public ResponseEntity<BookingPriceResponseDTO> calculateBookingPrice(
+//            @Parameter(description = "ID of the guesthouse") @RequestParam Long guesthouseId,
+//            @Parameter(description = "Check-in date (yyyy-MM-dd)") @RequestParam String checkInDate,
+//            @Parameter(description = "Check-out date (yyyy-MM-dd)") @RequestParam String checkOutDate) {
+//
+//        BookingPriceResponseDTO response =bookingService.calculateBookingPrice(guesthouseId, checkInDate, checkOutDate);
+//        return ResponseEntity.ok(response);
+//    }
 
     @PostMapping
     @PreAuthorize("hasRole('CLIENT')")

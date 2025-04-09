@@ -9,6 +9,7 @@ import org.easytrip.easytripbackend.model.Guesthouse;
 import org.easytrip.easytripbackend.model.Role;
 import org.easytrip.easytripbackend.model.User;
 import org.easytrip.easytripbackend.repository.BookingRepository;
+import org.easytrip.easytripbackend.repository.GuesthouseRepository;
 import org.easytrip.easytripbackend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -30,52 +31,54 @@ public class BookingService {
     private GuesthouseService guesthouseService;
 
     @Autowired
+    private GuesthouseRepository guesthouseRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
 
-    public BookingPriceResponseDTO calculateBookingPrice(Long guesthouseId, String checkInDate, String checkOutDate) {
-        Guesthouse guesthouse = guesthouseService.getGuesthouseEntityById(guesthouseId);
-        LocalDate checkIn = LocalDate.parse(checkInDate);
-        LocalDate checkOut = LocalDate.parse(checkOutDate);
-
-        long nights = ChronoUnit.DAYS.between(checkIn, checkOut);
-        if(nights < 0) {
-            throw new RuntimeException("Nights must be greater than zero");
-        }
-        BookingPriceResponseDTO bookingPriceResponseDTO = new BookingPriceResponseDTO();
-        bookingPriceResponseDTO.setGuesthouseId(guesthouseId);
-        bookingPriceResponseDTO.setCheckInDate(checkIn.toString());
-        bookingPriceResponseDTO.setCheckOutDate(checkOut.toString());
-        bookingPriceResponseDTO.setTotalPrice(nights * guesthouse.getPricePerNight());
-
-        return bookingPriceResponseDTO;
-    }
+//    public BookingPriceResponseDTO calculateBookingPrice(Long guesthouseId, String checkInDate, String checkOutDate) {
+//        Guesthouse guesthouse = guesthouseService.getGuesthouseEntityById(guesthouseId);
+//        LocalDate checkIn = LocalDate.parse(checkInDate);
+//        LocalDate checkOut = LocalDate.parse(checkOutDate);
+//
+//        long nights = ChronoUnit.DAYS.between(checkIn, checkOut);
+//        if(nights < 0) {
+//            throw new RuntimeException("Nights must be greater than zero");
+//        }
+//        BookingPriceResponseDTO bookingPriceResponseDTO = new BookingPriceResponseDTO();
+//        bookingPriceResponseDTO.setGuesthouseId(guesthouseId);
+//        bookingPriceResponseDTO.setCheckInDate(checkIn.toString());
+//        bookingPriceResponseDTO.setCheckOutDate(checkOut.toString());
+//        bookingPriceResponseDTO.setTotalPrice(nights * guesthouse.getPricePerNight());
+//
+//        return bookingPriceResponseDTO;
+//    }
 
     public BookingResponseDTO bookGuesthouse(BookingRequestDTO request) {
         // Get the authenticated user (traveler)
-        Authentication auth= SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
+        LocalDate now = LocalDate.now();
+        if(request.getCheckInDate().isBefore(now)){
+            throw new RuntimeException("CheckInDate cannot be in the past");
+        }
+        if(request.getCheckOutDate().isBefore(request.getCheckInDate())){
+            throw new RuntimeException("CheckOutDate must be after checkInDate");
+        }
+        //Get authenticated user
+        String email= SecurityContextHolder.getContext().getAuthentication().getName();
         User traveler= authService.findByEmail(email);
 
-
-        //validate dates
-        if(request.getCheckInDate().isBefore(LocalDate.now())) {
-            throw new RuntimeException("CheckInDate must be after this recent time");
-        }
-        if(request.getCheckInDate().isAfter(request.getCheckOutDate())) {
-            throw new RuntimeException("CheckOutDate must be after this recent time");
-        }
-
-
-
+        //Get guesthouse
+        Guesthouse guesthouse = guesthouseRepository.findById(request.getGuesthouseId())
+                .orElseThrow(()-> new IllegalArgumentException("Guesthouse not found"));
 
 //        User traveler = authService.findByUserId(request.getUserId());
         if(!traveler.getRole().contains(Role.CLIENT)) {
             throw new RuntimeException("You are not the client/traveller of this traveler");
         }
 
-//        Guesthouse guesthouse = guesthouse.service
-        Guesthouse guesthouse= guesthouseService.getGuesthouseEntityById(request.getGuesthouseId());
+////        Guesthouse guesthouse = guesthouse.service
+//        Guesthouse guesthouse= guesthouseService.getGuesthouseEntityById(request.getGuesthouseId());
         LocalDate checkInDate = request.getCheckInDate();
         LocalDate checkOutDate = request.getCheckOutDate();
 
@@ -90,7 +93,6 @@ public class BookingService {
         booking.setCheckInDate(checkInDate);
         booking.setCheckOutDate(checkOutDate);
         booking.setTotalPrice(nights * guesthouse.getPricePerNight());
-
         Booking savedBooking = bookingRepository.save(booking);
         return mapToResponseDto(savedBooking);// need to be improved
     }

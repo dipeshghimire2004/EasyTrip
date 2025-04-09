@@ -18,6 +18,7 @@ public class GuesthouseResponseDTO {
     private String description;
     private String amenities;
     private String verifiedDocument;
+    private User user;
     private String status;
     private double pricePerNight;
 //    private User owner;
