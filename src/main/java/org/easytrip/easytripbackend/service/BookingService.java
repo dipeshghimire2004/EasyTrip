@@ -40,7 +40,8 @@ public class BookingService {
     @Autowired
     private UserRepository userRepository;
 
-
+    @Autowired
+    private NotificationService notificationService;
 
     public BookingResponseDTO bookGuesthouse(BookingRequestDTO request) {
         // Get the authenticated user (traveler)
@@ -82,6 +83,22 @@ public class BookingService {
 
         Booking savedBooking = bookingRepository.save(booking);
         logger.info("Booking saved successfully with id{}", savedBooking.getId());
+
+        //notify the gueshouseowner
+        User owner = authService.findByUserId(guesthouse.getOwner().getId());
+        if(owner != null && owner.getRole().contains(Role.HOTEL_MANAGER)) {
+            notificationService.sendBookingNotification(
+                    owner.getEmail(),
+                    guesthouse.getName(),
+                    traveler.getName(),
+                    request.getCheckInDate().toString(),
+                    request.getCheckOutDate().toString(),
+                    booking.getTotalPrice()
+            );
+        }
+        else{
+            logger.warn("no valid owner found for gueshouse ID : {}", guesthouse.getId());
+        }
         return mapToResponseDto(savedBooking);
     }
 
