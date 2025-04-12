@@ -13,7 +13,6 @@ import java.time.LocalDate;
 public class BookingResponseDTO {
     private Long bookingId;
     private Long guesthouseId;
-    private User traveler;
     private String guesthouseName;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;

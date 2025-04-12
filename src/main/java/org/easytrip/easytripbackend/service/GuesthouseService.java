@@ -2,6 +2,7 @@ package org.easytrip.easytripbackend.service;
 
 import org.easytrip.easytripbackend.dto.GuesthouseRequestDTO;
 import org.easytrip.easytripbackend.dto.GuesthouseResponseDTO;
+import org.easytrip.easytripbackend.exception.GuesthouseNotFoundException;
 import org.easytrip.easytripbackend.exception.InvalidCredentialsException;
 import org.easytrip.easytripbackend.exception.UserNotFoundException;
 import org.easytrip.easytripbackend.model.Guesthouse;
@@ -63,6 +64,58 @@ public class GuesthouseService {
         logger.info("Guesthouse registered with ID: {}", savedGuestHouse.getId());
         return mapToResponse(savedGuestHouse);
     }
+    //update guesthouse
+    public GuesthouseResponseDTO updateGuesthouse(GuesthouseRequestDTO requestDTO, Long guesthouseId) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        logger.info("Updating guesthouse by email: {}" , email);
+
+        //get the current user
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        //Get the existing guesthouse
+        Guesthouse existingGuesthouse = guesthouseRepository.findById(guesthouseId)
+                .orElseThrow(() -> new GuesthouseNotFoundException("Guesthouse not found"));
+
+        //check if the current user is admin or owner
+        boolean isOwner = currentUser.getId().equals(existingGuesthouse.getOwner().getId());
+        boolean isAdmin = currentUser.getRole().contains(Role.ADMIN);
+        if(!isOwner && !isAdmin){
+            logger.error("User with email {} has no role ADMIN or HOTEL_MANAGER", email);
+            throw new InvalidCredentialsException("User must have ROLE_ADMIN or ROLE_MANAGER");
+        }
+        //update fields if they are provided in the request
+        if(requestDTO.getName()!=null){
+            existingGuesthouse.setName(requestDTO.getName());
+        }
+        if(requestDTO.getLocation()!=null){
+            existingGuesthouse.setLocation(requestDTO.getLocation());
+        }
+        if(requestDTO.getContactDetails()!=null){
+            existingGuesthouse.setContactDetails(requestDTO.getContactDetails());
+        }
+        if(requestDTO.getDescription()!=null){
+            existingGuesthouse.setDescription(requestDTO.getDescription());
+        }
+        if(requestDTO.getAmenities()!=null){
+            existingGuesthouse.setAmenities(requestDTO.getAmenities());
+        }
+        if(requestDTO.getVerifiedDocument()!=null && !requestDTO.getVerifiedDocument().isEmpty()){
+            String documentPath = fileStorageService.uploadFile(requestDTO.getVerifiedDocument(), currentUser.getId());
+            existingGuesthouse.setVerifiedDocument(documentPath);
+            //if document is updated, set status back to pending for admin review
+            existingGuesthouse.setStatus(GuesthouseApprovalStatus.PENDING);
+        }
+
+        if(isAdmin && requestDTO.getStatus()!=null){
+            existingGuesthouse.setStatus(GuesthouseApprovalStatus.valueOf(requestDTO.getStatus()));
+        }
+
+        Guesthouse updatedGuestHouse = guesthouseRepository.save(existingGuesthouse);
+        logger.info("Guesthouse updated with ID: {}", updatedGuestHouse.getId());
+        return mapToResponse(updatedGuestHouse);
+    }
+
 
     // Get all pending guesthouses (for admin dashboard)
     public List<GuesthouseResponseDTO> getPendingGuesthouses() {

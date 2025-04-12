@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.easytrip.easytripbackend.dto.GuesthouseRequestDTO;
 import org.easytrip.easytripbackend.dto.GuesthouseResponseDTO;
 import org.easytrip.easytripbackend.exception.GuesthouseNotFoundException;
@@ -53,6 +54,18 @@ public class GuesthouseController {
     })
     public ResponseEntity<GuesthouseResponseDTO> register(@ModelAttribute GuesthouseRequestDTO request) {
         GuesthouseResponseDTO response= guesthouseService.registerGuesthouse(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping(value="/{id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('HOTEL_MANAGER')")
+    @Operation(summary="Update a new Guesthouse", description ="Allows a Hotel manager to update their guesthouse")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Guesthouse registered successfully"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - Requires HOTEL_MANAGER role")
+    })
+    public ResponseEntity<GuesthouseResponseDTO> update(@PathVariable Long id, @Valid @ModelAttribute GuesthouseRequestDTO request) {
+        GuesthouseResponseDTO response= guesthouseService.updateGuesthouse(request, id);
         return ResponseEntity.ok(response);
     }
 

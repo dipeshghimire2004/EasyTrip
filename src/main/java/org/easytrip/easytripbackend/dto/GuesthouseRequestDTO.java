@@ -33,5 +33,6 @@ public class GuesthouseRequestDTO {
     private String description;
     private String amenities;
     private double pricePerNight;
+    private String status;
 
 }
