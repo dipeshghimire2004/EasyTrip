@@ -54,6 +54,7 @@ public class GuesthouseController {
     })
     public ResponseEntity<GuesthouseResponseDTO> register(@ModelAttribute GuesthouseRequestDTO request) {
         GuesthouseResponseDTO response= guesthouseService.registerGuesthouse(request);
+
         return ResponseEntity.ok(response);
     }
 

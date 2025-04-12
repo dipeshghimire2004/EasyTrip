@@ -49,6 +49,9 @@ public class GuesthouseService {
             logger.error("User with email {} has no role HOTEL_MANAGER", email);
            throw new InvalidCredentialsException("User must have ROLE_HOTEL_MANAGER");
         }
+
+        //validate amenities set to empty string if null
+//        String amenities = requestDTO.getAmenities();
         String documentPath = fileStorageService.uploadFile(requestDTO.getVerifiedDocument(), owner.getId());
         Guesthouse guestHouse = new Guesthouse();
         guestHouse.setName(requestDTO.getName());
@@ -60,6 +63,7 @@ public class GuesthouseService {
         guestHouse.setOwner(owner);
         guestHouse.setPricePerNight(requestDTO.getPricePerNight());
 
+        logger.info("Received amenities: {}", requestDTO.getAmenities());
         Guesthouse savedGuestHouse = guesthouseRepository.save(guestHouse);
         logger.info("Guesthouse registered with ID: {}", savedGuestHouse.getId());
         return mapToResponse(savedGuestHouse);
@@ -191,17 +195,19 @@ public class GuesthouseService {
                 .collect(Collectors.toList());
     }
 
-    private GuesthouseResponseDTO mapToResponse(Guesthouse guestHouse) {
+    private GuesthouseResponseDTO mapToResponse(Guesthouse guesthouse) {
         GuesthouseResponseDTO responseDTO = new GuesthouseResponseDTO();
-        responseDTO.setId(guestHouse.getId());
-        responseDTO.setName(guestHouse.getName());
-        responseDTO.setLocation(guestHouse.getLocation());
-        responseDTO.setContactDetails(guestHouse.getContactDetails());
-        responseDTO.setVerifiedDocument(guestHouse.getVerifiedDocument());
-        responseDTO.setDescription(guestHouse.getDescription());
-        responseDTO.setAmenities(guestHouse.getAmenities());
-        responseDTO.setStatus(guestHouse.getStatus().name());
-        responseDTO.setPricePerNight(guestHouse.getPricePerNight());
+        responseDTO.setId(guesthouse.getId());
+        responseDTO.setName(guesthouse.getName());
+        responseDTO.setLocation(guesthouse.getLocation());
+        responseDTO.setContactDetails(guesthouse.getContactDetails());
+        responseDTO.setVerifiedDocument(guesthouse.getVerifiedDocument());
+        responseDTO.setDescription(guesthouse.getDescription());
+        responseDTO.setAmenities(guesthouse.getAmenities());
+        responseDTO.setStatus(guesthouse.getStatus().name());
+        responseDTO.setPricePerNight(guesthouse.getPricePerNight());
+        responseDTO.setOwnerId(guesthouse.getOwner().getId());
+        responseDTO.setOwnerName(guesthouse.getOwner().getName());
         return responseDTO;
     }
 }

@@ -3,6 +3,8 @@ package org.easytrip.easytripbackend.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Entity
 @Table(name="guesthouses")
@@ -21,7 +23,11 @@ public class Guesthouse {
     private String contactDetails;
 
     private String description;
-    private String amenities;   // Could be a JSON or separate table later
+
+    @ElementCollection
+    @CollectionTable(name="guesthouse_amenities", joinColumns=@JoinColumn(name="gueshouse_id"))
+    @Column(name="amenity")
+    private List<String> amenities;
 
     @Column(nullable=false)
     private String verifiedDocument;
