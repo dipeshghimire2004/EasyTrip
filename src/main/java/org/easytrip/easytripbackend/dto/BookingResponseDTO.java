@@ -16,7 +16,7 @@ public class BookingResponseDTO {
     private String guesthouseName;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
-    private double totalPrice;
+//    private double totalPrice;
     private String paymentOption; // e.g., "Cash on Arrival"
     private String status;
 }

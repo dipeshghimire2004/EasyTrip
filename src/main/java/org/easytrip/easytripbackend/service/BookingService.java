@@ -18,9 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class BookingService {
@@ -43,6 +46,7 @@ public class BookingService {
     @Autowired
     private NotificationService notificationService;
 
+    @Transactional
     public BookingResponseDTO bookGuesthouse(BookingRequestDTO request) {
         // Get the authenticated user (traveler)
         LocalDate now = LocalDate.now();
@@ -80,6 +84,7 @@ public class BookingService {
         booking.setCheckOutDate(checkOutDate);
         booking.setTotalPrice(nights * guesthouse.getPricePerNight());
         booking.setStatus("CONFIRMED");
+        booking.setPaymentOption("Cash on Arrival");
 
         Booking savedBooking = bookingRepository.save(booking);
         logger.info("Booking saved successfully with id{}", savedBooking.getId());
@@ -104,16 +109,22 @@ public class BookingService {
 
     public BookingResponseDTO cancelBooking(Long bookingId) {
         String email= SecurityContextHolder.getContext().getAuthentication().getName();
+        logger.info("Attempting to cancel booking ID: {} by user: {}", bookingId, email);
+
         User traveler= authService.findByEmail(email);
-        if(!traveler.getRole().contains(Role.CLIENT)) {
-            throw new RuntimeException("You are not the client/traveller of this traveler");
+        Set<Role> roles= new HashSet<>(traveler.getRole());
+        if(!roles.contains(Role.CLIENT)) {
+            logger.warn("User {} lacks CLIENT role", email);
+            throw new RuntimeException("You are not the client/traveller of this booking");
         }
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
 
         //verify ownership
-        if(!booking.getTraveler().equals(traveler.getId())) {
-            throw new IllegalArgumentException("You can only cancel your booking booking");
+        if(!booking.getTraveler().getId().equals(traveler.getId())) {
+            logger.warn("User {} attempted to cancel booking ID: {} owned by {}",
+                    email, bookingId, booking.getTraveler().getEmail());
+            throw new RuntimeException("You can only cancel your own booking");
         }
 
         //check cancellation policy (e.g. before check-in date
@@ -121,9 +132,32 @@ public class BookingService {
             throw new IllegalArgumentException("Cannot cancel booking less than 24 hours before check-in");
         }
 
+        if ("CANCELLED".equals(booking.getStatus())) {
+            throw new IllegalArgumentException("Booking is already cancelled");
+        }
+
         booking.setStatus("CANCELLED");
-        Booking updateBooking = bookingRepository.save(booking);
-        return mapToResponseDto(updateBooking);
+        Booking updatedBooking = bookingRepository.save(booking);
+
+        // Notify the guesthouse owner
+        try {
+            Guesthouse guesthouse = updatedBooking.getGuesthouse();
+            User owner = authService.findByUserId(guesthouse.getOwner().getId());
+            if (owner != null && owner.getRole() != null && owner.getRole().contains(Role.HOTEL_MANAGER)) {
+                notificationService.sendCancellationNotification(
+                        owner.getEmail(),
+                        guesthouse.getName(),
+                        traveler.getName(),
+                        updatedBooking.getCheckInDate().toString(),
+                        updatedBooking.getCheckOutDate().toString()
+                );
+            } else {
+                logger.warn("No valid owner found for guesthouse ID: {}", guesthouse.getId());
+            }
+        } catch (Exception e) {
+            logger.error("Error notifying owner of cancellation for booking ID: {}: {}", bookingId, e.getMessage());
+        }
+        return mapToResponseDto(updatedBooking);
     }
 
 
@@ -180,10 +214,7 @@ public class BookingService {
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
     }
 
-    public Booking findById(long bookingId) {
-        return bookingRepository.findById(bookingId)
-                .orElseThrow(()->new RuntimeException("Booking not found"));
-    }
+
 
     private BookingResponseDTO mapToResponseDto(Booking booking) {
         BookingResponseDTO bookingResponseDTO = new BookingResponseDTO();
@@ -192,7 +223,9 @@ public class BookingService {
         bookingResponseDTO.setGuesthouseName(booking.getGuesthouse().getName());
         bookingResponseDTO.setCheckInDate(booking.getCheckInDate());
         bookingResponseDTO.setCheckOutDate(booking.getCheckOutDate());
-        bookingResponseDTO.setTotalPrice(booking.getTotalPrice());
+//        bookingResponseDTO.setTotalPrice(booking.getTotalPrice());
+        bookingResponseDTO.setPaymentOption(booking.getPaymentOption());
+        bookingResponseDTO.setStatus(booking.getStatus());
         return bookingResponseDTO;
     }
 }

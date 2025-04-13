@@ -13,9 +13,11 @@ import org.easytrip.easytripbackend.dto.BookingUpdateRequestDTO;
 import org.easytrip.easytripbackend.model.Guesthouse;
 import org.easytrip.easytripbackend.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.util.ConcurrentModificationException;
 
 
 @RestController
@@ -57,7 +61,7 @@ public class BookingController {
             @ApiResponse(responseCode = "400", description = "Invalid dates or guesthouse not approved"),
             @ApiResponse(responseCode = "403", description = "Forbidden - Requires CLIENT role")
     })
-    public ResponseEntity<BookingResponseDTO> bookGuesthouse(@PathVariable Long bookingId) {
+    public ResponseEntity<BookingResponseDTO> cancelBooking(@PathVariable Long bookingId) {
         BookingResponseDTO response= bookingService.cancelBooking(bookingId);
         return ResponseEntity.ok(response);
     }
@@ -75,5 +79,11 @@ public class BookingController {
             @Valid @RequestBody BookingUpdateRequestDTO request) {
         BookingResponseDTO response = bookingService.modifyBooking(bookingId, request);
         return ResponseEntity.ok(response);
+    }
+
+    @ExceptionHandler(ConcurrentModificationException.class)
+    public ResponseEntity<String> handleConcurrentModification(ConcurrentModificationException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body("Operation failed due to concurrent modification. Please try again.");
     }
 }
