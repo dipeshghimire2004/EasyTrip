@@ -98,16 +98,20 @@ export default function BookingApp() {
   }, []);
 
   // Map guesthouses to hotels with necessary data
-  const hotels = guesthouses.map((item) => ({
-    name: item.name,
-    price: item.pricePerNight,
-    roomType: item.roomType || "Double", // Customize if needed
-    location: item.location,
-    rating: item.rating || 4.0, // Placeholder
-    amenities: item.amenities?.split(",").map((a) => a.trim()) || [],
-    id: item.id, // Assuming `id` is the unique identifier for guesthouses
-    raw: item,
-  }));
+  const hotels = guesthouses
+    .filter((item) => item.status === "APPROVED")
+    .map((item) => ({
+      name: item.name,
+      price: item.pricePerNight,
+      roomType: item.roomType || "Double",
+      location: item.location,
+      rating: item.rating || 4.0,
+      amenities: Array.isArray(item.amenities)
+        ? item.amenities.map((a) => a.trim())
+        : [],
+      id: item.id,
+      raw: item,
+    }));
 
   useEffect(() => {
     const filters = {
@@ -140,6 +144,7 @@ export default function BookingApp() {
       !hotel.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
       return false;
+
     if (selectedPrice !== "All ( Price )") {
       if (selectedPrice === "Under $100" && hotel.price >= 100) return false;
       if (
@@ -154,6 +159,7 @@ export default function BookingApp() {
         if (hotel.price < min || hotel.price > max) return false;
       }
     }
+
     if (selectedRoom !== "All ( Room )" && hotel.roomType !== selectedRoom)
       return false;
 
@@ -166,16 +172,19 @@ export default function BookingApp() {
           return false;
       } else if (hotel.location !== selectedLocation) return false;
     }
+
     if (selectedRating !== "All ( Rating )") {
       const minRating = parseInt(selectedRating[0]);
       if (hotel.rating < minRating) return false;
     }
+
     if (selectedAmenities.length > 0) {
       const hasAll = selectedAmenities.every((a) =>
         hotel.amenities.includes(a)
       );
       if (!hasAll) return false;
     }
+
     return true;
   });
 
@@ -202,8 +211,8 @@ export default function BookingApp() {
         state: {
           startDate,
           endDate,
-          pricePerNight: selectedHotel.price, // Passing price per night
-          guesthousesid: selectedHotel.id, // Ensure using correct `id` here
+          pricePerNight: selectedHotel.price,
+          guesthousesid: selectedHotel.id,
         },
       });
     }

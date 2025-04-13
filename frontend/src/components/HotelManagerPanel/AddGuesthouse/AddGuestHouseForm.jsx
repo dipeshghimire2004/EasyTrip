@@ -9,16 +9,26 @@ export default function GuestHouseDashboard() {
     contactDetails: "",
     verifiedDocument: null,
     description: "",
-    amenities: "",
+    amenities: [],
     pricePerNight: "",
   })
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "file" ? files[0] : value,
-    }))
+    if (name === "amenities") {
+      const checked = e.target.checked
+      setFormData((prev) => ({
+        ...prev,
+        amenities: checked
+          ? [...prev.amenities, value]
+          : prev.amenities.filter((item) => item !== value),
+      }))
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === "file" ? files[0] : value,
+      }))
+    }
   }
 
   const handleSubmit = (e) => {
@@ -29,9 +39,13 @@ export default function GuestHouseDashboard() {
     form.append("location", formData.location)
     form.append("contactDetails", formData.contactDetails)
     form.append("description", formData.description)
-    form.append("amenities", formData.amenities)
     form.append("pricePerNight", formData.pricePerNight)
     form.append("status", "pending")
+
+    // Append each amenity separately as amenities[]
+    formData.amenities.forEach((amenity) => {
+      form.append("amenities[]", amenity)
+    })
 
     if (formData.verifiedDocument) {
       form.append("verifiedDocument", formData.verifiedDocument)
@@ -54,7 +68,7 @@ export default function GuestHouseDashboard() {
       <header className="w-full flex justify-between items-center p-4 border-b shadow-sm">
         <h1 className="text-xl font-medium">Guesthouse Owner Dashboard</h1>
         <div className="flex gap-4">
-          <Link to="/HOTEL_MANAGER/guestHouseOverview">
+          <Link to="/HOTEL_MANAGER/dashboard">
             <h2 className="text-blue-500 text-sm">back to Dashboard</h2>
           </Link>
         </div>
@@ -121,13 +135,20 @@ export default function GuestHouseDashboard() {
 
           <div>
             <label className="block text-sm mb-1">Amenities</label>
-            <input
-              name="amenities"
-              type="text"
-              onChange={handleChange}
-              className="w-full p-2 border rounded-md"
-              placeholder="Wi-Fi, Pool, Gym"
-            />
+            <div className="flex gap-4 flex-wrap">
+              {["Wi-Fi", "Pool", "Gym", "Parking", "Breakfast"].map((item) => (
+                <label key={item} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    name="amenities"
+                    value={item}
+                    checked={formData.amenities.includes(item)}
+                    onChange={handleChange}
+                  />
+                  {item}
+                </label>
+              ))}
+            </div>
           </div>
 
           <div>

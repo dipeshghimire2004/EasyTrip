@@ -10,6 +10,7 @@ import AboutUs from "./components/AboutUs/AboutUs"
 import AddGuestHouseForm from "./components/HotelManagerPanel/AddGuesthouse/AddGuestHouseForm";
 import Contact from "./components/Contact/Contact";
 import GuestHouseOverview from "./components/HotelManagerPanel/GuestHouseOverview/GuestHouseOverview";
+import GuestHouseDashboard from "./components/HotelManagerPanel/Dashboard/Dashboard";
 
 function ProtectedRoute({ element, userRole, allowedRoles }) {
   if (!allowedRoles.includes(userRole)) {
@@ -47,6 +48,7 @@ function App() {
         {/* Guesthouse Owner Routes */}
         <Route path="/HOTEL_MANAGER/signup" element={<Signup role="HOTEL_MANAGER" />} />
         <Route path="/HOTEL_MANAGER/login" element={<Login role="HOTEL_MANAGER" setUserRole={setUserRole} />} />
+        <Route path="/HOTEL_MANAGER/dashboard" element={<ProtectedRoute element={<GuestHouseDashboard />} userRole={userRole} allowedRoles={["HOTEL_MANAGER"]} />} />
         <Route path="/HOTEL_MANAGER/addGuestHouse" element={<ProtectedRoute element={<AddGuestHouseForm />} userRole={userRole} allowedRoles={["HOTEL_MANAGER"]} />} />
         <Route path="/HOTEL_MANAGER/guestHouseOverview" element={<ProtectedRoute element={<GuestHouseOverview />} userRole={userRole} allowedRoles={["HOTEL_MANAGER"]} />} />
       </Routes>

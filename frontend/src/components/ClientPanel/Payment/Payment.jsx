@@ -4,26 +4,30 @@ import api from "../../API/Api"; // Import the Axios instance
 
 export default function Payment() {
   const location = useLocation();
-  const { startDate: initialStartDate, endDate: initialEndDate, pricePerNight, guesthousesid } = location.state || {}; // Extract price per night
+  const { startDate: initialStartDate, endDate: initialEndDate, pricePerNight, guesthousesid } = location.state || {};
 
   const [isBooked, setIsBooked] = useState(false);
   const [isCancel, setIsCancel] = useState(false);
   const [startDate, setStartDate] = useState(initialStartDate || "");
   const [endDate, setEndDate] = useState(initialEndDate || "");
+  const [isLoadingConfirm, setIsLoadingConfirm] = useState(false);
+  const [isLoadingCancel, setIsLoadingCancel] = useState(false);
+  const [bookingId, setBookingId] = useState(0); // State to hold the booking ID
 
-  const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split("T")[0];
 
   const isButtonDisabled =
     !startDate ||
     !endDate ||
-    new Date(startDate) < new Date(today) || // Prevents past dates
-    new Date(startDate) >= new Date(endDate); // Prevents same start and end date
+    new Date(startDate) < new Date(today) ||
+    new Date(startDate) >= new Date(endDate);
 
   const handleConfirmBooking = async () => {
+    setIsLoadingConfirm(true);
+
     const numberOfDays = calculateNumberOfDays();
     const totalPrice = calculateTotalPrice();
 
-    // Prepare the booking data
     const bookingData = {
       guesthouseId: guesthousesid,
       checkInDate: startDate,
@@ -33,10 +37,12 @@ export default function Payment() {
 
     try {
       console.log(bookingData);
-      const response = await api.post("/api/bookings", bookingData); // Use axios API instance to send POST request
+      const response = await api.post("/api/bookings", bookingData);
       if (response.status === 200) {
+        setBookingId(response.data.bookingId); // Save booking ID from the response
+        console.log("Booking ID saved:", response.data.bookingId); // Log after saving to ensure it's saved
         setIsBooked(true);
-        setIsCancel(true); // Enable the Cancel button
+        setIsCancel(true);
         alert("Booking Confirmed! Thank you for choosing EasyTrip.");
       } else {
         alert("Booking failed. Please try again.");
@@ -44,27 +50,45 @@ export default function Payment() {
     } catch (error) {
       alert("An error occurred. Please try again later.");
       console.error(error);
+    } finally {
+      setIsLoadingConfirm(false);
     }
   };
 
-  const handleCancelBooking = () => {
-    alert("Booking Canceled!");
-    setIsCancel(false); // Disable the Cancel button
-    setIsBooked(false); // Re-enable the Confirm button
+  const handleCancelBooking = async () => {
+    if (!bookingId) {
+      alert("No booking to cancel.");
+      return;
+    }
+
+    setIsLoadingCancel(true);
+    try {
+      const response = await api.delete(`/api/bookings/${bookingId}`); // Call the cancel API with the booking ID
+      if (response.status === 200) {
+        alert("Booking Canceled!");
+        setIsCancel(false);
+        setIsBooked(false);
+      } else {
+        alert("Failed to cancel. Please try again.");
+      }
+    } catch (error) {
+      alert("Failed to cancel. Please try again.");
+      console.error(error);
+    } finally {
+      setIsLoadingCancel(false);
+    }
   };
 
-  // Calculate the number of days between startDate and endDate
   const calculateNumberOfDays = () => {
     if (startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
       const diffInTime = end - start;
-      return diffInTime / (1000 * 3600 * 24); // Days between start and end
+      return diffInTime / (1000 * 3600 * 24);
     }
     return 0;
   };
 
-  // Calculate the total price based on price per night and number of days
   const calculateTotalPrice = () => {
     const numberOfDays = calculateNumberOfDays();
     return numberOfDays * pricePerNight;
@@ -88,14 +112,14 @@ export default function Payment() {
             type="date"
             className="border p-2 rounded-md"
             value={startDate}
-            min={today} // Prevent selecting past dates
+            min={today}
             onChange={(e) => setStartDate(e.target.value)}
           />
           <input
             type="date"
             className="border p-2 rounded-md"
             value={endDate}
-            min={startDate || today} // Ensure end date is not before start date
+            min={startDate || today}
             onChange={(e) => setEndDate(e.target.value)}
           />
         </div>
@@ -117,19 +141,19 @@ export default function Payment() {
       </div>
 
       <button
-        className={`p-2 mb-2 rounded-md w-full ${isButtonDisabled || isBooked ? "bg-gray-400 cursor-not-allowed" : "bg-green-500 text-white"}`}
+        className={`p-2 mb-2 rounded-md w-full ${isButtonDisabled || isBooked || isLoadingConfirm ? "bg-gray-400 cursor-not-allowed" : "bg-green-500 text-white"}`}
         onClick={handleConfirmBooking}
-        disabled={isButtonDisabled || isBooked}
+        disabled={isButtonDisabled || isBooked || isLoadingConfirm}
       >
-        Confirm Booking
+        {isLoadingConfirm ? "Processing..." : "Confirm Booking"}
       </button>
 
       <button
-        className={`p-2 rounded-md w-full ${!isCancel || isButtonDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 text-white"}`}
+        className={`p-2 rounded-md w-full ${!isCancel || isButtonDisabled || isLoadingCancel ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 text-white"}`}
         onClick={handleCancelBooking}
-        disabled={!isCancel || isButtonDisabled}
+        disabled={!isCancel || isButtonDisabled || isLoadingCancel}
       >
-        Cancel Booking
+        {isLoadingCancel ? "Cancelling..." : "Cancel Booking"}
       </button>
     </div>
   );
