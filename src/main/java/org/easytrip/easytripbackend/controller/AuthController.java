@@ -6,17 +6,20 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.easytrip.easytripbackend.dto.GuesthouseResponseDTO;
 import org.easytrip.easytripbackend.dto.LoginRequest;
 import org.easytrip.easytripbackend.dto.RegisterRequest;
 import org.easytrip.easytripbackend.model.User;
 import org.easytrip.easytripbackend.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -54,6 +57,16 @@ public class AuthController {
         Map<String, String> tokens = authService.login(request);
         System.out.println("generated tokens: "+tokens);
         return ResponseEntity.ok(tokens);
+    }
+
+
+
+    @GetMapping()
+    @Operation(summary =" Get users ")
+    @ApiResponse(responseCode = "200", description = "Users lists")
+    public ResponseEntity<List<User>> getUsers() {
+        List <User> users = authService.getAllUsers();
+        return ResponseEntity.ok(users);
     }
 
     @PostMapping("/refresh")
