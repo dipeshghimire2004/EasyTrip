@@ -1,16 +1,27 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useState } from "react";
+
+// All
 import Signup from "./components/SignUp/signup";
 import Login from "./components/Login/Login";
-import HotelBookingUI from "./components/Booking/BookingApp";
-import Payment from './components/ClientPanel/Payment/Payment';
-import AdminPanel from './components/AdminPanel/AdminPanel';
 import Home from "./components/Home/Home";
 import AboutUs from "./components/AboutUs/AboutUs"
-import AddGuestHouseForm from "./components/HotelManagerPanel/AddGuesthouse/AddGuestHouseForm";
 import Contact from "./components/Contact/Contact";
+import HotelBookingUI from "./components/Booking/BookingApp";
+
+// Users
+import Payment from './components/ClientPanel/Payment/Payment';
+
+// Admin
+import AdminPanel from './components/AdminPanel/AdminPanel';
+
+// Guesthouse Owners
+import AddGuestHouseForm from "./components/HotelManagerPanel/AddGuesthouse/AddGuestHouseForm";
 import GuestHouseOverview from "./components/HotelManagerPanel/GuestHouseOverview/GuestHouseOverview";
 import GuestHouseDashboard from "./components/HotelManagerPanel/Dashboard/Dashboard";
+
+// Bus Owners
+import BusOwnerSignUp from "./components/Bus/BusOwnerSignUp/BusOwnerSignUp";
 
 function ProtectedRoute({ element, userRole, allowedRoles }) {
   if (!allowedRoles.includes(userRole)) {
@@ -51,6 +62,9 @@ function App() {
         <Route path="/HOTEL_MANAGER/dashboard" element={<ProtectedRoute element={<GuestHouseDashboard />} userRole={userRole} allowedRoles={["HOTEL_MANAGER"]} />} />
         <Route path="/HOTEL_MANAGER/addGuestHouse" element={<ProtectedRoute element={<AddGuestHouseForm />} userRole={userRole} allowedRoles={["HOTEL_MANAGER"]} />} />
         <Route path="/HOTEL_MANAGER/guestHouseOverview" element={<ProtectedRoute element={<GuestHouseOverview />} userRole={userRole} allowedRoles={["HOTEL_MANAGER"]} />} />
+
+        {/* Bus Owner Routes */}
+        <Route path="/BUS_OWNER/signup" element={<BusOwnerSignUp role="BUS_OWNER" />} />
       </Routes>
     </Router>
   );
