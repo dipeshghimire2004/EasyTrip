@@ -24,6 +24,10 @@ public class Booking {
     @JoinColumn(name="guesthouse_id", nullable=false)
     private Guesthouse guesthouse;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="room_id")
+    private Room room;
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "check_in_date", nullable = false)
     private LocalDate checkInDate;

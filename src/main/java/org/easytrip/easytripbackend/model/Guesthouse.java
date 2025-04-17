@@ -41,5 +41,5 @@ public class Guesthouse {
     private User owner;
 
 
-    private double pricePerNight;
+//    private double pricePerNight;
 }

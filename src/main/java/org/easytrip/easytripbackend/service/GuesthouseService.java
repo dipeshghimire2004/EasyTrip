@@ -8,6 +8,7 @@ import org.easytrip.easytripbackend.exception.UserNotFoundException;
 import org.easytrip.easytripbackend.model.Guesthouse;
 import org.easytrip.easytripbackend.model.GuesthouseApprovalStatus;
 import org.easytrip.easytripbackend.model.Role;
+import org.easytrip.easytripbackend.model.Room;
 import org.easytrip.easytripbackend.model.User;
 import org.easytrip.easytripbackend.repository.GuesthouseRepository;
 import org.easytrip.easytripbackend.repository.UserRepository;
@@ -36,6 +37,7 @@ public class GuesthouseService {
     private UserRepository userRepository;
 
 
+    private Room room;
 
     @Autowired
     private  FileStorageService fileStorageService;
@@ -61,7 +63,7 @@ public class GuesthouseService {
         guestHouse.setAmenities(requestDTO.getAmenities());
         guestHouse.setVerifiedDocument(documentPath);
         guestHouse.setOwner(owner);
-        guestHouse.setPricePerNight(requestDTO.getPricePerNight());
+        room.setPricePerNight(requestDTO.getPricePerNight());
 
         logger.info("Received amenities: {}", requestDTO.getAmenities());
         Guesthouse savedGuestHouse = guesthouseRepository.save(guestHouse);
@@ -205,7 +207,7 @@ public class GuesthouseService {
         responseDTO.setDescription(guesthouse.getDescription());
         responseDTO.setAmenities(guesthouse.getAmenities());
         responseDTO.setStatus(guesthouse.getStatus().name());
-        responseDTO.setPricePerNight(guesthouse.getPricePerNight());
+        responseDTO.setPricePerNight(room.getPricePerNight());
         responseDTO.setOwnerId(guesthouse.getOwner().getId());
         responseDTO.setOwnerName(guesthouse.getOwner().getName());
         return responseDTO;

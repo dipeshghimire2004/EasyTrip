@@ -8,9 +8,11 @@ import org.easytrip.easytripbackend.dto.GuesthouseResponseDTO;
 import org.easytrip.easytripbackend.model.Booking;
 import org.easytrip.easytripbackend.model.Guesthouse;
 import org.easytrip.easytripbackend.model.Role;
+import org.easytrip.easytripbackend.model.Room;
 import org.easytrip.easytripbackend.model.User;
 import org.easytrip.easytripbackend.repository.BookingRepository;
 import org.easytrip.easytripbackend.repository.GuesthouseRepository;
+import org.easytrip.easytripbackend.repository.RoomRepository;
 import org.easytrip.easytripbackend.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +46,9 @@ public class BookingService {
     private UserRepository userRepository;
 
     @Autowired
+    private RoomRepository roomRepository;
+
+    @Autowired
     private NotificationService notificationService;
 
     @Transactional
@@ -67,6 +72,17 @@ public class BookingService {
         Guesthouse guesthouse = guesthouseRepository.findById(request.getGuesthouseId())
                 .orElseThrow(()-> new IllegalArgumentException("Guesthouse not found"));
 
+        // Get room
+        Room room = roomRepository.findById(request.getRoomId())
+                .orElseThrow(()-> new IllegalArgumentException("Room not found"));
+
+        if(!room.getGuesthouseId().equals(guesthouse.getId())){
+            throw new IllegalArgumentException("Room does not belong to specified guesthouse");
+        }
+
+        if(!room.isAvailable()){
+            throw new IllegalArgumentException("Room is not available");
+        }
 
 //        Guesthouse guesthouse= guesthouseService.getGuesthouseEntityById(request.getGuesthouseId());
         LocalDate checkInDate = request.getCheckInDate();
@@ -80,14 +96,19 @@ public class BookingService {
         Booking booking = new Booking();
         booking.setTraveler(traveler);
         booking.setGuesthouse(guesthouse);
+        booking.setRoom(room);
         booking.setCheckInDate(checkInDate);
         booking.setCheckOutDate(checkOutDate);
-        booking.setTotalPrice(nights * guesthouse.getPricePerNight());
+        booking.setTotalPrice(nights * room.getPricePerNight());
         booking.setStatus("CONFIRMED");
         booking.setPaymentOption("Cash on Arrival");
 
         Booking savedBooking = bookingRepository.save(booking);
         logger.info("Booking saved successfully with id{}", savedBooking.getId());
+
+        //update availability
+        room.setAvailable(false);
+        roomRepository.save(room);
 
         //notify the gueshouseowner
         User owner = authService.findByUserId(guesthouse.getOwner().getId());
@@ -197,11 +218,13 @@ public class BookingService {
         }
 
         // Recalculate totalPrice
-        long nights = ChronoUnit.DAYS.between(booking.getCheckInDate(), booking.getCheckOutDate());
-        if (nights <= 0) {
-            throw new IllegalArgumentException("Check-out date must be after check-in date");
-        }
-        booking.setTotalPrice(nights * booking.getGuesthouse().getPricePerNight());
+//        long nights = ChronoUnit.DAYS.between(booking.getCheckInDate(), booking.getCheckOutDate());
+//        if (nights <= 0) {
+//            throw new IllegalArgumentException("Check-out date must be after check-in date");
+//        }
+//        booking.setTotalPrice(nights * booking.getGuesthouse().getPricePerNight());
+
+
         booking.setStatus("MODIFIED"); // Optional, for tracking
 
         Booking updatedBooking = bookingRepository.save(booking);
@@ -220,6 +243,7 @@ public class BookingService {
         BookingResponseDTO bookingResponseDTO = new BookingResponseDTO();
         bookingResponseDTO.setBookingId(booking.getId());
        bookingResponseDTO.setGuesthouseId(booking.getGuesthouse().getId());
+       bookingResponseDTO.setRoomId(booking.getRoom().getId());
         bookingResponseDTO.setGuesthouseName(booking.getGuesthouse().getName());
         bookingResponseDTO.setCheckInDate(booking.getCheckInDate());
         bookingResponseDTO.setCheckOutDate(booking.getCheckOutDate());

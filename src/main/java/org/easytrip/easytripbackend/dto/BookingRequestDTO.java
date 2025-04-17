@@ -17,6 +17,9 @@ public class BookingRequestDTO {
     @NotNull(message="Guesthouse ID is required")
     private Long guesthouseId;
 
+    @NotNull(message = "Room ID is required")
+    private Long roomId;
+
 
     @NotNull(message = "Check-in date is required")
     @FutureOrPresent(message = "Check-in date must be today or in the future")
@@ -28,6 +31,6 @@ public class BookingRequestDTO {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate checkOutDate;
 
-    private Double totalPrice;
+//    private Double totalPrice;
 
 }
