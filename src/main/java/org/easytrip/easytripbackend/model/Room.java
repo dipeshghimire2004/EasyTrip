@@ -15,7 +15,7 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="gueshouse_id", nullable=false)
+    @Column(name="guesthouse_id", nullable=false)
     private Long guesthouseId;
 
 //    @ManyToOne

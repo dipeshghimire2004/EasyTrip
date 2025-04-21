@@ -28,7 +28,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name="user_role", joinColumns=@JoinColumn(name="user_id"))
     @Column(name="role")

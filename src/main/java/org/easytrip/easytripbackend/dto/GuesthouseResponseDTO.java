@@ -23,6 +23,6 @@ public class GuesthouseResponseDTO {
     private Long ownerId;
     private String ownerName;
     private String status;
-    private double pricePerNight;
+//    private double pricePerNight;
 //    private User owner;
 }

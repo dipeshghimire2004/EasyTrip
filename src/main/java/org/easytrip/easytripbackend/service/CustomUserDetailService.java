@@ -20,9 +20,17 @@ public class CustomUserDetailService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found with email :"+email);
         }
 
+//        String[] rolesName= user.getRole()
+//                .stream().map(role-> role.name())
+//                .toArray(String[]::new);
+//
         String[] rolesName= user.getRole()
-                .stream().map(role-> role.name())
+                .stream().map(Enum::name)
                 .toArray(String[]::new);
+
+        if(!user.isActive()) {
+            throw new UsernameNotFoundException("User not found/ is not active with email :"+email);
+        }
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmail())
