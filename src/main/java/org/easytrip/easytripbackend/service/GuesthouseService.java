@@ -63,7 +63,7 @@ public class GuesthouseService {
         guestHouse.setAmenities(requestDTO.getAmenities());
         guestHouse.setVerifiedDocument(documentPath);
         guestHouse.setOwner(owner);
-        room.setPricePerNight(requestDTO.getPricePerNight());
+//        room.setPricePerNight(requestDTO.getPricePerNight());
 
         logger.info("Received amenities: {}", requestDTO.getAmenities());
         Guesthouse savedGuestHouse = guesthouseRepository.save(guestHouse);
@@ -207,7 +207,7 @@ public class GuesthouseService {
         responseDTO.setDescription(guesthouse.getDescription());
         responseDTO.setAmenities(guesthouse.getAmenities());
         responseDTO.setStatus(guesthouse.getStatus().name());
-        responseDTO.setPricePerNight(room.getPricePerNight());
+//        responseDTO.setPricePerNight(room.getPricePerNight());
         responseDTO.setOwnerId(guesthouse.getOwner().getId());
         responseDTO.setOwnerName(guesthouse.getOwner().getName());
         return responseDTO;

@@ -35,6 +35,6 @@ public class GuesthouseRequestDTO {
     @Schema(description = "List of amenities", example = "[\"WiFi\", \"Pool\", \"Parking\"]")
     private List<String> amenities;
 
-    private double pricePerNight;
+//    private double pricePerNight;
     private String status;
 }

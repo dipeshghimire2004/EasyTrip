@@ -61,6 +61,7 @@ public class BookingService {
         if(request.getCheckOutDate().isBefore(request.getCheckInDate())){
             throw new IllegalArgumentException("CheckOutDate must be after checkInDate");
         }
+
         //Get authenticated user
         String email= SecurityContextHolder.getContext().getAuthentication().getName();
         User traveler= authService.findByEmail(email);

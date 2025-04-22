@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookingRequestDTO {
-    @NotNull(message="Guesthouse ID is required")
+//    @NotNull(message="Guesthouse ID is required")
     private Long guesthouseId;
 
     @NotNull(message = "Room ID is required")

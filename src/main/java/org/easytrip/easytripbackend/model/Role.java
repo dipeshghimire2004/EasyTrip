@@ -6,3 +6,5 @@ package org.easytrip.easytripbackend.model;
         BUS_OWNER,
         ADMIN
     }
+
+

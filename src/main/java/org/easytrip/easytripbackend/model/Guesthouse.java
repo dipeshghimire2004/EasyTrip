@@ -36,7 +36,7 @@ public class Guesthouse {
     @Column(nullable = false)
     private GuesthouseApprovalStatus status = GuesthouseApprovalStatus.PENDING;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="owner_id", nullable=false)
     private User owner;
 

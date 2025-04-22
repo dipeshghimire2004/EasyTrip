@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,19 +27,34 @@ public class AuthService {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @Autowired
     private AuthenticationManager authenticationManager;
+    public void testAuthentication(String email, String password) {
+        try{
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, password)
+            );
+            logger.info("Authentication successful:{}", authentication);
+        }
+        catch(Exception e){
+            logger.error("Authentication failed:{}", e.getMessage());
+        }
+    }
 
+    @Autowired
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
+    }
+
+    @Transactional
     public User register(RegisterRequest request) {
+
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             logger.error("Passwords do not match for email: {}", request.getEmail());
             throw new InvalidCredentialsException("Passwords do not match");
@@ -52,7 +68,8 @@ public class AuthService {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        String roleStr = request.getRole() != null ? request.getRole().trim() : "CLIENT";
+        user.setActive(true); // Make sure to set active status
+        String roleStr = request.getRole() != null ? request.getRole().trim().toUpperCase() : "CLIENT";
         logger.info("Requested role: '{}'", roleStr);
         logger.info("Available roles: {}", Arrays.toString(Role.values()));
 
@@ -68,14 +85,48 @@ public class AuthService {
         return userRepository.save(user);
     }
 
+//    public Map<String, String> login(LoginRequest request) {
+//        logger.info("Login attempt for email: {}", request.getEmail());
+//        try {
+//
+//            User user = userRepository.findByEmail(request.getEmail())
+//                    .orElseThrow(() -> new UserNotFoundException("User not found"));
+//
+//            // Debug: Check if password matches
+//            boolean passwordMatches = passwordEncoder.matches(request.getPassword(), user.getPassword());
+//            logger.info("Password matches: {}", passwordMatches);
+//
+//            Authentication authentication =testAuthentication()
+//            Set<String> roles = user.getRole().stream().map(Enum::name).collect(Collectors.toSet());
+//            Map<String, String> tokens = new HashMap<>();
+//            tokens.put("accessToken", jwtUtil.generateToken(user.getEmail(), roles));
+//            tokens.put("refreshToken", jwtUtil.generateRefreshToken(user.getEmail()));
+//            logger.info("Login successful for email: {}", request.getEmail());
+//            logger.info("Generated tokens: {}", tokens);
+//            return tokens;
+//        } catch (Exception e) {
+//            logger.error("Invalid credentials for email: {}", request.getEmail());
+//            throw new InvalidCredentialsException("Invalid email or password");
+//        }
+//    }
+
     public Map<String, String> login(LoginRequest request) {
         logger.info("Login attempt for email: {}", request.getEmail());
         try {
+            User user = userRepository.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+            // Debug: Check if password matches
+            boolean passwordMatches = passwordEncoder.matches(request.getPassword(), user.getPassword());
+            logger.info("Password matches: {}", passwordMatches);
+
+            // Debug: Log user details
+            logger.info("User details: email={}, isActive={}, roles={}",
+                    user.getEmail(), user.isActive(), user.getRole());
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
-            User user = userRepository.findByEmail(request.getEmail())
-                    .orElseThrow(() -> new UserNotFoundException("User not found"));
             Set<String> roles = user.getRole().stream().map(Enum::name).collect(Collectors.toSet());
             Map<String, String> tokens = new HashMap<>();
             tokens.put("accessToken", jwtUtil.generateToken(user.getEmail(), roles));
@@ -84,10 +135,11 @@ public class AuthService {
             logger.info("Generated tokens: {}", tokens);
             return tokens;
         } catch (Exception e) {
-            logger.error("Invalid credentials for email: {}", request.getEmail());
+            logger.error("Login failed for email: {}", request.getEmail(), e);
             throw new InvalidCredentialsException("Invalid email or password");
         }
     }
+
 
     public String refreshToken(String refreshToken) {
         logger.info("Refreshing token");
@@ -126,4 +178,7 @@ public class AuthService {
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found"));
     }
+
+    //Helper Methods
+//    private void validateRegistration(RegieterRequeser user) {}
 }
