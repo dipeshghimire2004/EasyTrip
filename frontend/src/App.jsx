@@ -8,6 +8,7 @@ import Home from "./components/Home/Home";
 import AboutUs from "./components/AboutUs/AboutUs"
 import Contact from "./components/Contact/Contact";
 import HotelBookingUI from "./components/Booking/BookingApp";
+import BusBookingPayment from "./components/ClientPanel/BusBookingPayment/BusBookingPayment";
 
 // Users
 import Payment from './components/ClientPanel/Payment/Payment';
@@ -51,6 +52,7 @@ function App() {
         <Route path="/CLIENT/signup" element={<Signup role="CLIENT" />} />
         <Route path="/CLIENT/login" element={<Login role="CLIENT" setUserRole={setUserRole} />} />
         <Route path="/CLIENT/payment" element={<ProtectedRoute element={<Payment />} userRole={userRole} allowedRoles={["CLIENT"]} />} />
+        <Route path="/CLIENT/buspayment" element={<ProtectedRoute element={<BusBookingPayment />} userRole={userRole} allowedRoles={["CLIENT"]} />} />
 
         {/* Admin Routes */}
         <Route path="/ADMIN/login" element={<Login role="ADMIN" setUserRole={setUserRole} />} />
