@@ -1,8 +1,27 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import api from "../API/api";
+import api, { setAuthToken } from "../API/Api";
 
-export default function Login({ role = "CLIENT", setUserRole }) { // Accept setUserRole as prop
+// Helper function to decode a JWT payload
+function parseJwt(token) {
+  try {
+    const base64Url = token.split('.')[1]; // JWT token structure: header.payload.signature
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    // Decode the base64 string
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    console.error("Failed to parse JWT:", e);
+    return {};
+  }
+}
+
+export default function Login({ role = "CLIENT", setUserRole }) {
   const {
     register,
     handleSubmit,
@@ -13,28 +32,44 @@ export default function Login({ role = "CLIENT", setUserRole }) { // Accept setU
   const onSubmit = (data) => {
     const loginData = {
       email: data.email,
-      password: data.password
+      password: data.password,
     };
-    alert(`Logging in as ${role} with email: ${data.email}`);
 
-    // Set the user role when login is successful
-    setUserRole(role);  
+    alert(`Logging in as ${role} with email: ${data.email}`);
+    setUserRole(role);
 
     api.post("/api/auth/login", loginData)
-      .then(response => {
-        console.log("Login successful:", response.data);
-        if (role === "ADMIN") {
-          navigate("/ADMIN/panel");
-        } else if (role === "HOTEL_MANAGER") {
-          navigate("/HOTEL_MANAGER/addGuestHouse");
-        } else {
-          navigate("/booking");
-        }
+      .then((response) => {
+        const { accessToken, refreshToken } = response.data;
+        setAuthToken(accessToken);
+        localStorage.setItem("accessToken", accessToken);
+
+        // Decode the JWT access token using the helper function
+        const decodedToken = parseJwt(accessToken);
+        // console.log(decodedToken);
+        const tokenRole = (decodedToken.roles && decodedToken.roles[0]) || role;
+        console.log("Extracted Role:", tokenRole);
+        setUserRole(tokenRole);
+        // Save role to localStorage
+        localStorage.setItem("userRole", tokenRole);
+
+        // Set cookie without secure & with lax
+        document.cookie = `refreshToken=${refreshToken}; path=/; max-age=${7 * 24 * 60 * 60}; samesite=lax`;
+
+        // Navigate after short delay to ensure cookie is saved
+        setTimeout(() => {
+          if (tokenRole === "ADMIN") {
+            navigate("/ADMIN/panel");
+          } else if (tokenRole === "HOTEL_MANAGER") {
+            navigate("/HOTEL_MANAGER/addGuestHouse");
+          } else {
+            navigate("/booking");
+          }
+        }, 100);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Login error:", error.response?.data || error.message);
       });
-    
   };
 
   return (
@@ -54,8 +89,7 @@ export default function Login({ role = "CLIENT", setUserRole }) { // Accept setU
                 {...register("email", {
                   required: "Email is required",
                   pattern: {
-                    value:
-                      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
                     message: "Invalid email address",
                   },
                 })}
@@ -81,9 +115,7 @@ export default function Login({ role = "CLIENT", setUserRole }) { // Accept setU
                 className="w-full p-3 border rounded-lg mt-1 focus:ring-2 focus:ring-green-500"
               />
               {errors.password && (
-                <p className="text-red-500 text-sm">
-                  {errors.password.message}
-                </p>
+                <p className="text-red-500 text-sm">{errors.password.message}</p>
               )}
             </div>
             <button

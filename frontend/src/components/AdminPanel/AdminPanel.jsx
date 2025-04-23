@@ -6,6 +6,8 @@ import BookingLog from "./pages/BookingLog";
 import ApprovalLog from "./pages/ApprovalLog";
 import UserAccounts from "./pages/UserAccounts";
 import GuestHouseDetails from "./pages/GuestHouseDetails";
+import GuestHouseListing from "./pages/GuestHouseListing";
+
 import UserProfile from "./pages/UserProfile";
 import NotFound from "./pages/NotFound"; 
 
@@ -23,10 +25,11 @@ function AdminPanel() {
         <Routes>
           <Route path="/panel" element={<Dashboard />} />
           <Route path="/userAccounts" element={<UserAccounts/>} />
-          <Route path="/userAccounts/Guesthouse Owner" element={<GuestHouseDetails/>} />
-          <Route path="/userAccounts/user" element={<UserProfile/>} />
+          {/* <Route path="/userAccounts/Guesthouse Owner" element={<GuestHouseDetails/>} /> */}
+          {/* <Route path="/userAccounts/user" element={<UserProfile/>} /> */}
           <Route path="/bookinglog" element={<BookingLog />} />
           <Route path="/approvallog" element={<ApprovalLog />} />
+          <Route path="/guestHouseListing" element={<GuestHouseListing />} />
           {/* Wildcard route to show the 'Page Not Found' message */}
           <Route path="*" element={<NotFound />} />
         </Routes>
