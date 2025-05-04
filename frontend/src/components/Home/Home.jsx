@@ -34,9 +34,13 @@ const HeroSection = () => {
         />
       </div>
 
-      <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mt-4 w-full max-w-md">
+      {/* Buttons Section */}
+      <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mt-4 w-full max-w-2xl">
         <Link to="/booking" className="w-full">
           <button className="bg-blue-500 text-white px-4 py-2 rounded w-full">Find Guesthouses</button>
+        </Link>
+        <Link to="/bussearch" className="w-full">
+          <button className="bg-yellow-500 text-white px-4 py-2 rounded w-full">Find Buses</button>
         </Link>
         <Link to="/HOTEL_MANAGER/addGuestHouse" className="w-full">
           <button className="bg-green-500 text-white px-4 py-2 rounded w-full">List Your Guesthouse</button>
@@ -45,6 +49,7 @@ const HeroSection = () => {
     </div>
   );
 };
+
 
 const Features = () => {
   const features = [
