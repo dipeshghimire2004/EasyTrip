@@ -43,7 +43,7 @@ const Navbar = () => {
           <Link to="/HOTEL_MANAGER/login">
             <button className="bg-green-500 text-white px-4 py-2 rounded">Guesthouse Owner Login/Register</button>
           </Link>
-          <Link to="/BUS_MANAGER/login">
+          <Link to="/BUS_OWNER/signup">
             <button className="bg-yellow-500 text-white px-4 py-2 rounded">Bus Owner Login/Register</button>
           </Link>
         </div>

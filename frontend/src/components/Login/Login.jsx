@@ -2,19 +2,12 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import api, { setAuthToken } from "../API/Api";
 
-<<<<<<< HEAD
 // Helper function to decode a JWT payload
 function parseJwt(token) {
   try {
     const base64Url = token.split('.')[1]; // JWT token structure: header.payload.signature
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     // Decode the base64 string
-=======
-function parseJwt(token) {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
->>>>>>> da8668efc9d2f664695b206a2acd8bcc7401c59b
     const jsonPayload = decodeURIComponent(
       atob(base64)
         .split('')

@@ -8,16 +8,10 @@ import Home from "./components/Home/Home";
 import AboutUs from "./components/AboutUs/AboutUs"
 import Contact from "./components/Contact/Contact";
 import HotelBookingUI from "./components/Booking/BookingApp";
-<<<<<<< HEAD
-import BusBookingPayment from "./components/ClientPanel/BusBookingPayment/BusBookingPayment";
-
-// Users
-=======
 import BusSearch from "./components/ClientPanel/BusSearch/BusSearch";
 
 // Users
 import BusBookingPayment from "./components/ClientPanel/BusBookingPayment/BusBookingPayment";
->>>>>>> da8668efc9d2f664695b206a2acd8bcc7401c59b
 import Payment from './components/ClientPanel/Payment/Payment';
 
 // Admin
@@ -30,10 +24,6 @@ import GuestHouseDashboard from "./components/HotelManagerPanel/Dashboard/Dashbo
 
 // Bus Owners
 import BusOwnerSignUp from "./components/Bus/BusOwnerSignUp/BusOwnerSignUp";
-<<<<<<< HEAD
-
-=======
->>>>>>> da8668efc9d2f664695b206a2acd8bcc7401c59b
 
 function ProtectedRoute({ element, userRole, allowedRoles }) {
   if (!allowedRoles.includes(userRole)) {

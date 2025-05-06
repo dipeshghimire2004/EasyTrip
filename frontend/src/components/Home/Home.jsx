@@ -5,62 +5,48 @@ import Layout from "../Layout/Layout";
 
 const HeroSection = () => {
   return (
-      <div className="flex flex-col items-center justify-center text-white h-[30rem] text-center bg-no-repeat bg-cover bg-center" style={{backgroundImage: `url(${Image})`}}>
-        <h1 className="text-2xl font-bold">Discover Your Next Adventure</h1>
-        <div className="flex space-x-2 p-2 rounded mt-4">
-          <input type="text" placeholder="Where are you going?" className="p-2 border rounded bg-white text-gray-500" />
-          <input type="text" placeholder="Check-in" className="p-2 border rounded bg-white text-gray-500" />
-          <input type="text" placeholder="Check-out" className="p-2 border rounded bg-white text-gray-500" />
-          <input type="text" placeholder="Guests" className="p-2 border rounded bg-white text-gray-500" />
-        </div>
-        <div className="space-x-2 mt-4">
-          <Link to="/booking">
-              <button className="bg-blue-500 text-white px-4 py-2 rounded">Find Guesthouses</button>
-          </Link>
-          <Link to="/HOTEL_MANAGER/addGuestHouse">
-            <button className="bg-green-500 text-white px-4 py-2 rounded">List Your Guesthouse</button>
-          </Link>
-        </div>
-    <div
-      className="flex flex-col items-center justify-center text-white h-[30rem] text-center bg-no-repeat bg-cover bg-center px-4"
-      style={{ backgroundImage: `url(${Image})` }}
-    >
-      <h1 className="text-2xl md:text-4xl font-bold">Discover Your Next Adventure</h1>
+    <div className="flex flex-col items-center justify-center text-white h-[30rem] text-center bg-no-repeat bg-cover bg-center" style={{backgroundImage: `url(${Image})`}}>
+      <div
+        className="flex flex-col items-center justify-center text-white h-[30rem] text-center bg-no-repeat bg-cover bg-center px-4"
+        style={{ backgroundImage: `url(${Image})` }}
+      >
+        <h1 className="text-2xl md:text-4xl font-bold">Discover Your Next Adventure</h1>
 
-      <div className="flex flex-col md:flex-row md:space-x-2 space-y-2 md:space-y-0 p-2 rounded mt-4 w-full max-w-2xl">
-        <input
-          type="text"
-          placeholder="Where are you going?"
-          className="p-2 border rounded bg-white text-gray-500 w-full"
-        />
-        <input
-          type="text"
-          placeholder="Check-in"
-          className="p-2 border rounded bg-white text-gray-500 w-full"
-        />
-        <input
-          type="text"
-          placeholder="Check-out"
-          className="p-2 border rounded bg-white text-gray-500 w-full"
-        />
-        <input
-          type="text"
-          placeholder="Guests"
-          className="p-2 border rounded bg-white text-gray-500 w-full"
-        />
-      </div>
+        <div className="flex flex-col md:flex-row md:space-x-2 space-y-2 md:space-y-0 p-2 rounded mt-4 w-full max-w-2xl">
+          <input
+            type="text"
+            placeholder="Where are you going?"
+            className="p-2 border rounded bg-white text-gray-500 w-full"
+          />
+          <input
+            type="text"
+            placeholder="Check-in"
+            className="p-2 border rounded bg-white text-gray-500 w-full"
+          />
+          <input
+            type="text"
+            placeholder="Check-out"
+            className="p-2 border rounded bg-white text-gray-500 w-full"
+          />
+          <input
+            type="text"
+            placeholder="Guests"
+            className="p-2 border rounded bg-white text-gray-500 w-full"
+          />
+        </div>
 
-      {/* Buttons Section */}
-      <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mt-4 w-full max-w-2xl">
-        <Link to="/booking" className="w-full">
-          <button className="bg-blue-500 text-white px-4 py-2 rounded w-full">Find Guesthouses</button>
-        </Link>
-        <Link to="/bussearch" className="w-full">
-          <button className="bg-yellow-500 text-white px-4 py-2 rounded w-full">Find Buses</button>
-        </Link>
-        <Link to="/HOTEL_MANAGER/addGuestHouse" className="w-full">
-          <button className="bg-green-500 text-white px-4 py-2 rounded w-full">List Your Guesthouse</button>
-        </Link>
+        {/* Buttons Section */}
+        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mt-4 w-full max-w-2xl">
+          <Link to="/booking" className="w-full">
+            <button className="bg-blue-500 text-white px-4 py-2 rounded w-full">Find Guesthouses</button>
+          </Link>
+          <Link to="/bussearch" className="w-full">
+            <button className="bg-yellow-500 text-white px-4 py-2 rounded w-full">Find Buses</button>
+          </Link>
+          <Link to="/HOTEL_MANAGER/addGuestHouse" className="w-full">
+            <button className="bg-green-500 text-white px-4 py-2 rounded w-full">List Your Guesthouse</button>
+          </Link>
+        </div>
       </div>
     </div>
   );
