@@ -1,20 +1,11 @@
 import React from "react";
+import Sidebar from "../Sidebar/Sidebar";
 
 const BusDashboard = () => {
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-60 bg-white shadow-md p-4">
-        <h1 className="text-xl font-bold mb-6">EasyTrip Dashboard</h1>
-        <ul className="space-y-4">
-          <li className="text-gray-700 hover:text-blue-600 cursor-pointer">Dashboard</li>
-          <li className="text-gray-700 hover:text-blue-600 cursor-pointer">My Listings</li>
-          <li className="text-gray-700 hover:text-blue-600 cursor-pointer">Bookings</li>
-        </ul>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 p-6">
+    <div className="flex">
+      <Sidebar />
+      <main className="ml-60 p-6 w-full bg-gray-100 min-h-screen">
         <h2 className="text-2xl font-bold mb-4">Welcome Back!</h2>
 
         {/* Bus Listings */}
@@ -64,7 +55,7 @@ const BusDashboard = () => {
           <div className="bg-white rounded shadow p-4 mb-4">
             <p className="font-semibold">Confirmed Bookings</p>
             <p>Guest: Jane Smith</p>
-            <p>Booking: 2023-10-15 kathmandu to pokhara</p>
+            <p>Booking: 2023-10-15 Kathmandu to Pokhara</p>
           </div>
 
           <div className="bg-white rounded shadow p-4">
