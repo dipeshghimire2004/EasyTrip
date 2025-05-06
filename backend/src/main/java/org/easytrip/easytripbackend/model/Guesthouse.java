@@ -34,7 +34,7 @@ public class Guesthouse {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private GuesthouseApprovalStatus status = GuesthouseApprovalStatus.PENDING;
+    private ApprovalStatus status = ApprovalStatus.PENDING;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="owner_id", nullable=false)

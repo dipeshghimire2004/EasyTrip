@@ -1,6 +1,6 @@
 package org.easytrip.easytripbackend.model;
 
-public enum GuesthouseApprovalStatus {
+public enum ApprovalStatus {
     APPROVED,
     REJECTED,
     PENDING,

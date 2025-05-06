@@ -6,7 +6,7 @@ import org.easytrip.easytripbackend.exception.GuesthouseNotFoundException;
 import org.easytrip.easytripbackend.exception.InvalidCredentialsException;
 import org.easytrip.easytripbackend.exception.UserNotFoundException;
 import org.easytrip.easytripbackend.model.Guesthouse;
-import org.easytrip.easytripbackend.model.GuesthouseApprovalStatus;
+import org.easytrip.easytripbackend.model.ApprovalStatus;
 import org.easytrip.easytripbackend.model.Role;
 import org.easytrip.easytripbackend.model.Room;
 import org.easytrip.easytripbackend.model.User;
@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -110,11 +109,11 @@ public class GuesthouseService {
             String documentPath = fileStorageService.uploadFile(requestDTO.getVerifiedDocument(), currentUser.getId());
             existingGuesthouse.setVerifiedDocument(documentPath);
             //if document is updated, set status back to pending for admin review
-            existingGuesthouse.setStatus(GuesthouseApprovalStatus.PENDING);
+            existingGuesthouse.setStatus(ApprovalStatus.PENDING);
         }
 
         if(isAdmin && requestDTO.getStatus()!=null){
-            existingGuesthouse.setStatus(GuesthouseApprovalStatus.valueOf(requestDTO.getStatus()));
+            existingGuesthouse.setStatus(ApprovalStatus.valueOf(requestDTO.getStatus()));
         }
 
         Guesthouse updatedGuestHouse = guesthouseRepository.save(existingGuesthouse);
@@ -126,7 +125,7 @@ public class GuesthouseService {
     // Get all pending guesthouses (for admin dashboard)
     public List<GuesthouseResponseDTO> getPendingGuesthouses() {
         logger.info("Fetching all pending guesthouses");
-        List<Guesthouse> pending = guesthouseRepository.findByStatus(GuesthouseApprovalStatus.PENDING);
+        List<Guesthouse> pending = guesthouseRepository.findByStatus(ApprovalStatus.PENDING);
         return pending.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
@@ -150,7 +149,7 @@ public class GuesthouseService {
     public GuesthouseResponseDTO approveGuesthouse(long guesthouseId) {
         Guesthouse guesthouse = guesthouseRepository.findById(guesthouseId)
                 .orElseThrow(() -> new RuntimeException("Guesthouse not found"));
-        guesthouse.setStatus(GuesthouseApprovalStatus.APPROVED);
+        guesthouse.setStatus(ApprovalStatus.APPROVED);
         Guesthouse saved = guesthouseRepository.save(guesthouse);
         logger.info("Approved guesthouse with id {}" , guesthouseId);
         //TODO : Send Email verfication to owner
@@ -160,7 +159,7 @@ public class GuesthouseService {
     public GuesthouseResponseDTO rejectGuesthouse(long guesthouseId) {
         Guesthouse guesthouse = guesthouseRepository.findById(guesthouseId)
                 .orElseThrow(() -> new RuntimeException("Guesthouse not found"));
-        guesthouse.setStatus(GuesthouseApprovalStatus.REJECTED);
+        guesthouse.setStatus(ApprovalStatus.REJECTED);
         Guesthouse saved = guesthouseRepository.save(guesthouse);
         logger.info("Rejected guesthouse with id {}" , guesthouseId);
         // TODO: Send email notification to owner
@@ -180,7 +179,7 @@ public class GuesthouseService {
     public List<GuesthouseResponseDTO> searchGuesthouses(String location, String name) {
         logger.info("Searching guesthouses by location: {} and name: {}", location, name);
         List<Guesthouse> guesthouses;
-        guesthouses= guesthouseRepository.findByStatus(GuesthouseApprovalStatus.APPROVED);
+        guesthouses= guesthouseRepository.findByStatus(ApprovalStatus.APPROVED);
         if(location!= null && !location.isEmpty()){
             guesthouses =guesthouses.stream().
                     filter(g -> g.getLocation().equalsIgnoreCase(location)).collect(Collectors.toList());
