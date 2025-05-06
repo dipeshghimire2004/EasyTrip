@@ -5,11 +5,7 @@ import Layout from "../Layout/Layout";
 
 const HeroSection = () => {
   return (
-    <div className="flex flex-col items-center justify-center text-white h-[30rem] text-center bg-no-repeat bg-cover bg-center" style={{backgroundImage: `url(${Image})`}}>
-      <div
-        className="flex flex-col items-center justify-center text-white h-[30rem] text-center bg-no-repeat bg-cover bg-center px-4"
-        style={{ backgroundImage: `url(${Image})` }}
-      >
+      <div className="flex flex-col items-center justify-center text-white h-[30rem] text-center bg-no-repeat bg-cover bg-center" style={{backgroundImage: `url(${Image})`}}>
         <h1 className="text-2xl md:text-4xl font-bold">Discover Your Next Adventure</h1>
 
         <div className="flex flex-col md:flex-row md:space-x-2 space-y-2 md:space-y-0 p-2 rounded mt-4 w-full max-w-2xl">
@@ -48,7 +44,6 @@ const HeroSection = () => {
           </Link>
         </div>
       </div>
-    </div>
   );
 };
 
