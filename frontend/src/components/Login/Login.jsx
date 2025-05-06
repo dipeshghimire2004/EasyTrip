@@ -2,10 +2,12 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import api, { setAuthToken } from "../API/Api";
 
+// Helper function to decode a JWT payload
 function parseJwt(token) {
   try {
-    const base64Url = token.split('.')[1];
+    const base64Url = token.split('.')[1]; // JWT token structure: header.payload.signature
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    // Decode the base64 string
     const jsonPayload = decodeURIComponent(
       atob(base64)
         .split('')
@@ -42,14 +44,19 @@ export default function Login({ role = "CLIENT", setUserRole }) {
         setAuthToken(accessToken);
         localStorage.setItem("accessToken", accessToken);
 
+        // Decode the JWT access token using the helper function
         const decodedToken = parseJwt(accessToken);
+        // console.log(decodedToken);
         const tokenRole = (decodedToken.roles && decodedToken.roles[0]) || role;
         console.log("Extracted Role:", tokenRole);
         setUserRole(tokenRole);
+        // Save role to localStorage
         localStorage.setItem("userRole", tokenRole);
 
+        // Set cookie without secure & with lax
         document.cookie = `refreshToken=${refreshToken}; path=/; max-age=${7 * 24 * 60 * 60}; samesite=lax`;
 
+        // Navigate after short delay to ensure cookie is saved
         setTimeout(() => {
           if (tokenRole === "ADMIN") {
             navigate("/ADMIN/panel");
