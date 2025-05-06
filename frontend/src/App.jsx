@@ -13,6 +13,7 @@ import BusSearch from "./components/ClientPanel/BusSearch/BusSearch";
 // Users
 import BusBookingPayment from "./components/ClientPanel/BusBookingPayment/BusBookingPayment";
 import Payment from './components/ClientPanel/Payment/Payment';
+import MyBookings from "./components/ClientPanel/MyBooking/MyBookings";
 
 // Admin
 import AdminPanel from './components/AdminPanel/AdminPanel';
@@ -24,6 +25,10 @@ import GuestHouseDashboard from "./components/HotelManagerPanel/Dashboard/Dashbo
 
 // Bus Owners
 import BusOwnerSignUp from "./components/Bus/BusOwnerSignUp/BusOwnerSignUp";
+import BusDashboard from "./components/Bus/BusDashboard/BusDashboard";
+import BusListing from "./components/Bus/BusListing/BusListing";
+import UpadteAvailability from "./components/Bus/UpdateAvailability/UpdateAvailability";
+import UpdateAvailability from "./components/Bus/UpdateAvailability/UpdateAvailability";
 
 function ProtectedRoute({ element, userRole, allowedRoles }) {
   if (!allowedRoles.includes(userRole)) {
@@ -48,13 +53,14 @@ function App() {
         <Route path="/booking" element={<HotelBookingUI />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/bussearch" element={<BusSearch />} />
+        <Route path="/busSearch" element={<BusSearch />} />
 
         {/* User Routes */}
         <Route path="/CLIENT/signup" element={<Signup role="CLIENT" />} />
         <Route path="/CLIENT/login" element={<Login role="CLIENT" setUserRole={setUserRole} />} />
         <Route path="/CLIENT/payment" element={<ProtectedRoute element={<Payment />} userRole={userRole} allowedRoles={["CLIENT"]} />} />
-        <Route path="/CLIENT/buspayment" element={<ProtectedRoute element={<BusBookingPayment />} userRole={userRole} allowedRoles={["CLIENT"]} />} />
+        <Route path="/CLIENT/busPayment" element={<ProtectedRoute element={<BusBookingPayment />} userRole={userRole} allowedRoles={["CLIENT"]} />} />
+        <Route path="/CLIENT/Booked" element={<ProtectedRoute element={<MyBookings />} userRole={userRole} allowedRoles={["CLIENT"]} />} />
 
         {/* Admin Routes */}
         <Route path="/ADMIN/login" element={<Login role="ADMIN" setUserRole={setUserRole} />} />
@@ -69,6 +75,9 @@ function App() {
 
         {/* Bus Owner Routes */}
         <Route path="/BUS_OWNER/signup" element={<BusOwnerSignUp role="BUS_OWNER" />} />
+        <Route path="/BUS_OWNER/dashboard" element={<BusDashboard role="BUS_OWNER" />} />
+        <Route path="/BUS_OWNER/listing" element={<BusListing role="BUS_OWNER" />} />
+        <Route path="/BUS_OWNER/updateAvailability" element={<UpdateAvailability role="BUS_OWNER" />} />
       </Routes>
     </Router>
   );
