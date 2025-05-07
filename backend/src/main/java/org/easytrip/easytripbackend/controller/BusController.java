@@ -17,6 +17,7 @@ import org.easytrip.easytripbackend.dto.BusScheduleResponseDTO;
 import org.easytrip.easytripbackend.dto.BusScheduleSearchRequestDTO;
 import org.easytrip.easytripbackend.dto.BusScheduleSearchResponseDTO;
 import org.easytrip.easytripbackend.model.Bus;
+import org.easytrip.easytripbackend.service.BusBookingService;
 import org.easytrip.easytripbackend.service.BusScheduleService;
 import org.easytrip.easytripbackend.service.BusService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +48,8 @@ public class BusController {
     @Autowired
     private BusScheduleService busScheduleService;
 
-//    @Autowired
-//    private BusBookingService busBookingService;
+    @Autowired
+    private BusBookingService busBookingService;
 
     @Operation(summary = "Register a new bus", description = "Allows bus operators to register a new bus in the system")
     @ApiResponses(value = {
@@ -194,30 +195,30 @@ public class BusController {
         return ResponseEntity.ok(busScheduleService.searchBusSchedules(requestDTO));
     }
 
-//    @Operation(summary = "Book a bus", description = "Allows clients to book seats on a bus schedule")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Booking successful",
-//                    content = @Content(schema = @Schema(implementation = BusBookingResponseDTO.class))),
-//            @ApiResponse(responseCode = "400", description = "Bad request - invalid booking details"),
-//            @ApiResponse(responseCode = "403", description = "Forbidden - only clients can perform this action")
-//    })
-//    @PostMapping("/book")
-//    @PreAuthorize("hasRole('CLIENT')")
-//    public ResponseEntity<BusBookingResponseDTO> bookBus(@RequestBody BusBookingRequestDTO requestDTO) {
-//        return ResponseEntity.ok(busBookingService.bookBus(requestDTO));
-//    }
-//
-//    @Operation(summary = "Cancel booking", description = "Allows clients to cancel their bus booking")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Booking cancelled successfully"),
-//            @ApiResponse(responseCode = "404", description = "Booking not found"),
-//            @ApiResponse(responseCode = "403", description = "Forbidden - only the booking owner can perform this action")
-//    })
-//    @PutMapping("/cancel/{bookingId}")
-//    @PreAuthorize("hasRole('CLIENT')")
-//    public ResponseEntity<Void> cancelBooking(
-//            @Parameter(description = "ID of the booking to be cancelled") @PathVariable Long bookingId) {
-//        busBookingService.cancelBooking(bookingId);
-//        return ResponseEntity.ok().build();
-//    }
+    @Operation(summary = "Book a bus", description = "Allows clients to book seats on a bus schedule")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Booking successful",
+                    content = @Content(schema = @Schema(implementation = BusBookingResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request - invalid booking details"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - only clients can perform this action")
+    })
+    @PostMapping("/book")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<BusBookingResponseDTO> bookBus(@RequestBody BusBookingRequestDTO requestDTO) {
+        return ResponseEntity.ok(busBookingService.bookBus(requestDTO));
+    }
+
+    @Operation(summary = "Cancel booking", description = "Allows clients to cancel their bus booking")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Booking cancelled successfully"),
+            @ApiResponse(responseCode = "404", description = "Booking not found"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - only the booking owner can perform this action")
+    })
+    @PutMapping("/cancel/{bookingId}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<Void> cancelBooking(
+            @Parameter(description = "ID of the booking to be cancelled") @PathVariable Long bookingId) {
+        busBookingService.cancelBooking(bookingId);
+        return ResponseEntity.ok().build();
+    }
 }

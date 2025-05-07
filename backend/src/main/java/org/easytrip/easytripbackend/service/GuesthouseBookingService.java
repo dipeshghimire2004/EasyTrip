@@ -1,10 +1,8 @@
 package org.easytrip.easytripbackend.service;
 
-import org.easytrip.easytripbackend.dto.BookingPriceResponseDTO;
 import org.easytrip.easytripbackend.dto.BookingRequestDTO;
 import org.easytrip.easytripbackend.dto.BookingResponseDTO;
 import org.easytrip.easytripbackend.dto.BookingUpdateRequestDTO;
-import org.easytrip.easytripbackend.dto.GuesthouseResponseDTO;
 import org.easytrip.easytripbackend.model.Booking;
 import org.easytrip.easytripbackend.model.Guesthouse;
 import org.easytrip.easytripbackend.model.Role;
@@ -17,7 +15,6 @@ import org.easytrip.easytripbackend.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,8 +25,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
-public class BookingService {
-    private static Logger logger = LoggerFactory.getLogger(BookingService.class);
+public class GuesthouseBookingService {
+    private static Logger logger = LoggerFactory.getLogger(GuesthouseBookingService.class);
     @Autowired
     private BookingRepository bookingRepository;
 
