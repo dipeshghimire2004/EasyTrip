@@ -73,17 +73,17 @@ export default function Login({ role = "CLIENT", setUserRole }) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="relative w-3/4 max-w-4xl h-[500px]">
-        <div className="absolute top-0 left-0 w-1/2 h-full p-10">
-          <h2 className="text-3xl font-bold text-gray-800 text-center">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
+      <div className="flex flex-col md:flex-row w-full max-w-4xl bg-white rounded-2xl shadow-lg overflow-hidden">
+        
+        {/* Form Section */}
+        <div className="w-full md:w-1/2 p-8">
+          <h2 className="text-2xl font-bold text-gray-800 text-center">
             {role.charAt(0).toUpperCase() + role.slice(1)} Login
           </h2>
           <form className="mt-6" onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Your Email
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Your Email</label>
               <input
                 type="email"
                 {...register("email", {
@@ -100,9 +100,7 @@ export default function Login({ role = "CLIENT", setUserRole }) {
               )}
             </div>
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Password</label>
               <input
                 type="password"
                 {...register("password", {
@@ -127,18 +125,17 @@ export default function Login({ role = "CLIENT", setUserRole }) {
           </form>
           {role !== "ADMIN" && (
             <p className="mt-6 text-sm text-center">
-              Don't have an account?{" "}
-              <a
-                href={`/${role}/signup`}
-                className="text-green-600 font-semibold hover:underline"
-              >
+              Don’t have an account?{" "}
+              <a href={`/${role}/signup`} className="text-green-600 font-semibold hover:underline">
                 Sign Up Here
               </a>
             </p>
           )}
         </div>
-        <div className="absolute top-0 right-0 w-1/2 h-full p-10 bg-gradient-to-r from-black to-gray-800 text-white flex flex-col justify-center rounded-2xl">
-          <div className="bg-white bg-opacity-30 backdrop-blur-lg p-10 rounded-2xl">
+
+        {/* Welcome Section */}
+        <div className="w-full md:w-1/2 bg-gradient-to-r from-black to-gray-800 text-white flex flex-col justify-center p-8">
+          <div className="bg-white bg-opacity-30 backdrop-blur-lg p-6 rounded-2xl">
             <h2 className="text-3xl font-bold">Welcome Back</h2>
             <p className="mt-3 text-sm opacity-90">
               Login to continue and explore all features available to you.
