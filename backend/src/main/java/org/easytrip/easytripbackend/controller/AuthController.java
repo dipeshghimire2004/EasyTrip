@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.easytrip.easytripbackend.dto.LoginRequest;
 import org.easytrip.easytripbackend.dto.RegisterRequest;
 import org.easytrip.easytripbackend.model.User;
+import org.easytrip.easytripbackend.model.UserResponseDTO;
 import org.easytrip.easytripbackend.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -66,6 +67,14 @@ public class AuthController {
         List <User> users = authService.getAllUsers();
         return ResponseEntity.ok(users);
     }
+
+    @GetMapping("/users/active")
+    @Operation(summary =" Get users ")
+    @ApiResponse(responseCode = "200", description = "Users lists")
+    public ResponseEntity<List<UserResponseDTO>> getActiveUsers() {
+        return ResponseEntity.ok(authService.getActiveUsers(true));
+    }
+
 
     @PostMapping("/refresh")
     @Operation(summary = "Refresh access token", description = "Generates a new access token using a valid refresh token.")

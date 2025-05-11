@@ -8,6 +8,7 @@ import org.easytrip.easytripbackend.exception.UserNotFoundException;
 import org.easytrip.easytripbackend.model.Guesthouse;
 import org.easytrip.easytripbackend.model.Role;
 import org.easytrip.easytripbackend.model.User;
+import org.easytrip.easytripbackend.model.UserResponseDTO;
 import org.easytrip.easytripbackend.repository.UserRepository;
 import org.easytrip.easytripbackend.util.JwtUtil;
 import org.slf4j.Logger;
@@ -168,6 +169,7 @@ public class AuthService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
 //    public List<GuesthouseResponseDTO> getAllGuesthouses() {
 //        logger.info("Fetching all guesthouses");
 //        List<Guesthouse> guesthouses = guesthouseRepository.findAll();
@@ -177,10 +179,11 @@ public class AuthService {
 //        }
 //        return guesthouses.stream().map(this::mapToResponse).collect(Collectors.toList());
 //    }
-    public List<User> getActiveUsers(boolean isActive) {
-        return userRepository.findByIsActive(isActive);
+    public List<UserResponseDTO> getActiveUsers(boolean isActive) {
+        return userRepository.findByIsActive(isActive).stream()
+            .map(this::mapToUserResponseDTO)
+            .collect(Collectors.toList());
     }
-
     public User findByUserId(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
     }
@@ -191,4 +194,13 @@ public class AuthService {
 
     //Helper Methods
 //    private void validateRegistration(RegieterRequeser user) {}
+
+    private UserResponseDTO mapToUserResponseDTO(User user) {
+        Set<String> roleNames = user.getRole().stream()
+                .map(Enum::name)
+                .collect(Collectors.toSet());
+
+        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), roleNames);
+    }
+
 }
