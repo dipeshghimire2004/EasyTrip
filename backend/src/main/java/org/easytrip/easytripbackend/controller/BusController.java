@@ -103,19 +103,19 @@ public class BusController {
     @Operation(summary = "Approve a bus", description = "Allows an ADMIN to approve a bus")
     @ApiResponse(responseCode = "200", description = "Bus approved successfully", content = @Content(schema = @Schema(implementation = BusResponseDTO.class)))
     @PutMapping("/{busId}/approve")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BusResponseDTO> approveBus(
-            @Parameter(description = "ID of the bus to approve") @PathVariable Long busId,
-            @Parameter(description = "ID of the admin") @RequestParam Long adminId) {
-        return ResponseEntity.ok(busService.approveBus(busId, adminId));
+            @Parameter(description = "ID of the bus to approve") @PathVariable Long busId) {
+        return ResponseEntity.ok(busService.approveBus(busId));
     }
 
     @Operation(summary = "Deny a bus", description = "Allows an ADMIN to deny a bus")
     @ApiResponse(responseCode = "200", description = "Bus denied successfully", content = @Content(schema = @Schema(implementation = BusResponseDTO.class)))
     @PutMapping("/{busId}/deny")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BusResponseDTO> denyBus(
-            @Parameter(description = "ID of the bus to deny") @PathVariable Long busId,
-            @Parameter(description = "ID of the admin") @RequestParam Long adminId) {
-        return ResponseEntity.ok(busService.denyBus(busId, adminId));
+            @Parameter(description = "ID of the bus to deny") @PathVariable Long busId) {
+        return ResponseEntity.ok(busService.denyBus(busId));
     }
 
     @Operation(summary = "Search buses", description = "Allows anyone to search for approved buses by source and destination")

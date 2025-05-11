@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -27,7 +28,7 @@ public class Guesthouse {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "guesthouse_amenities", joinColumns = @JoinColumn(name = "gueshouse_id"))
     @Column(name = "amenity")
-    private List<String> amenities;
+    private Set<String> amenities;
 
     @Column(nullable=false)
     private String verifiedDocumentImage;

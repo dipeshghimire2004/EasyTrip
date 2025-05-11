@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -33,7 +34,7 @@ public class GuesthouseRequestDTO {
 
 
     @Schema(description = "List of amenities", example = "[\"WiFi\", \"Pool\", \"Parking\"]")
-    private List<String> amenities;
+    private Set<String> amenities;
 
 //    private double pricePerNight;
     private String status;

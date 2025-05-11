@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -151,14 +152,31 @@ public class GuesthouseService {
         return guesthouses.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
+//    public GuesthouseResponseDTO approveGuesthouse(long guesthouseId) {
+//        Guesthouse guesthouse = guesthouseRepository.findById(guesthouseId)
+//                .orElseThrow(() -> new RuntimeException("Guesthouse not found"));
+//        guesthouse.setStatus(ApprovalStatus.APPROVED);
+//        Guesthouse saved = guesthouseRepository.save(guesthouse);
+//        logger.info("Approved guesthouse with id {}" , guesthouseId);
+//        //TODO : Send Email verfication to owner
+//        return mapToResponse(saved);
+//    }
+    @Transactional
     public GuesthouseResponseDTO approveGuesthouse(long guesthouseId) {
-        Guesthouse guesthouse = guesthouseRepository.findById(guesthouseId)
-                .orElseThrow(() -> new RuntimeException("Guesthouse not found"));
-        guesthouse.setStatus(ApprovalStatus.APPROVED);
-        Guesthouse saved = guesthouseRepository.save(guesthouse);
-        logger.info("Approved guesthouse with id {}" , guesthouseId);
-        //TODO : Send Email verfication to owner
-        return mapToResponse(saved);
+        try {
+            Guesthouse guesthouse = guesthouseRepository.findById(guesthouseId)
+                    .orElseThrow(() -> new RuntimeException("Guesthouse not found"));
+            logger.info("Found guesthouse: {}", guesthouse);
+
+            guesthouse.setStatus(ApprovalStatus.APPROVED);
+            Guesthouse saved = guesthouseRepository.save(guesthouse);
+            logger.info("Approved guesthouse with id {}", guesthouseId);
+
+            return mapToResponse(saved);
+        } catch (Exception e) {
+            logger.error("Failed to approve guesthouse {}: {}", guesthouseId, e.getMessage(), e);
+            throw e;
+        }
     }
 
     public GuesthouseResponseDTO rejectGuesthouse(long guesthouseId) {

@@ -118,34 +118,29 @@ public class BusService {
         busRepository.delete(bus);
     }
 
-    public BusResponseDTO approveBus(Long busId, Long adminId) {
-        logger.info("Admin ID: {} approving bus ID: {}", adminId, busId);
+    public BusResponseDTO approveBus(Long busId) {
+        logger.info("Admin  approving bus ID: {}", busId);
         Bus bus = busRepository.findById(busId)
                 .orElseThrow(() -> new RuntimeException("Bus not found"));
-
-        User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new RuntimeException("Admin not found"));
-
-        if (!admin.getRole().contains(Role.ADMIN)) {
-            throw new RuntimeException("User is not an admin");
-        }
 
         bus.setStatus(ApprovalStatus.APPROVED);
         Bus updatedBus = busRepository.save(bus);
         return mapToResponse(updatedBus);
     }
+//    public GuesthouseResponseDTO approveGuesthouse(long guesthouseId) {
+//        Guesthouse guesthouse = guesthouseRepository.findById(guesthouseId)
+//                .orElseThrow(() -> new RuntimeException("Guesthouse not found"));
+//        guesthouse.setStatus(ApprovalStatus.APPROVED);
+//        Guesthouse saved = guesthouseRepository.save(guesthouse);
+//        logger.info("Approved guesthouse with id {}" , guesthouseId);
+//        //TODO : Send Email verfication to owner
+//        return mapToResponse(saved);
+//    }
 
-    public BusResponseDTO denyBus(Long busId, Long adminId) {
-        logger.info("Admin ID: {} denying bus ID: {}", adminId, busId);
+    public BusResponseDTO denyBus(Long busId) {
+        logger.info("Admin  denying bus ID: {}", busId);
         Bus bus = busRepository.findById(busId)
                 .orElseThrow(() -> new RuntimeException("Bus not found"));
-
-        User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new RuntimeException("Admin not found"));
-
-        if (!admin.getRole().contains(Role.ADMIN)) {
-            throw new RuntimeException("User is not an admin");
-        }
 
         bus.setStatus(ApprovalStatus.REJECTED);
         Bus updatedBus = busRepository.save(bus);
@@ -164,6 +159,7 @@ public class BusService {
         List<Bus> approvedBuses = busRepository.findByStatus(ApprovalStatus.APPROVED);
         return approvedBuses.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
+
 
     public List<BusResponseDTO> searchBuses(String source, String destination) {
         logger.info("Searching buses by source: {} and destination: {}", source, destination);
