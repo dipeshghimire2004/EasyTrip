@@ -79,6 +79,13 @@ public class GuesthouseController {
         List<GuesthouseResponseDTO> pending = guesthouseService.getPendingGuesthouses();
         return ResponseEntity.ok(pending);
     }
+    @GetMapping
+    @Operation(summary = "Get all pending guesthouses")
+    @ApiResponse(responseCode = "200", description = "List of approved guesthouses")
+    public ResponseEntity<List<GuesthouseResponseDTO>> getApprovedGuesthouses() {
+        List<GuesthouseResponseDTO> approved = guesthouseService.getApprovedGuesthouses();
+        return ResponseEntity.ok(approved);
+    }
 
     // ADMIN fetches a specific guesthouse by ID
     @GetMapping("/admin/{id}")

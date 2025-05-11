@@ -24,9 +24,9 @@ public class Guesthouse {
 
     private String description;
 
-    @ElementCollection
-    @CollectionTable(name="guesthouse_amenities", joinColumns=@JoinColumn(name="gueshouse_id"))
-    @Column(name="amenity")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "guesthouse_amenities", joinColumns = @JoinColumn(name = "gueshouse_id"))
+    @Column(name = "amenity")
     private List<String> amenities;
 
     @Column(nullable=false)
@@ -40,6 +40,4 @@ public class Guesthouse {
     @JoinColumn(name="owner_id", nullable=false)
     private User owner;
 
-
-//    private double pricePerNight;
 }

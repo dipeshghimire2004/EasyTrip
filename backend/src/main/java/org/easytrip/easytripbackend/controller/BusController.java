@@ -76,6 +76,20 @@ public class BusController {
         return ResponseEntity.ok(busService.updateBus(busId, request, userId));
     }
 
+
+    @Operation(summary = "Get Pending buses", description = "Allows a  ADMIN to view all the pending buses")
+    @GetMapping
+    public ResponseEntity<List<BusResponseDTO>> getPendingBuses(){
+        return ResponseEntity.ok(busService.getPendingBuses());
+    }
+
+    @Operation(summary = "Get Approved buses", description = "Allows a  ADMIN to view all the Approved buses")
+    @GetMapping
+    public ResponseEntity<List<BusResponseDTO>> getApprovedBuses(){
+        return ResponseEntity.ok(busService.getApprovedBuses());
+    }
+
+
     @Operation(summary = "Delete a bus", description = "Allows a BUS_OPERATOR or ADMIN to delete a bus")
     @ApiResponse(responseCode = "200", description = "Bus deleted successfully")
     @DeleteMapping("/{busId}")

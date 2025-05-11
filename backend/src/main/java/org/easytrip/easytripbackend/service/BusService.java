@@ -2,12 +2,14 @@ package org.easytrip.easytripbackend.service;
 
 import org.easytrip.easytripbackend.dto.BusRequestDTO;
 import org.easytrip.easytripbackend.dto.BusResponseDTO;
+import org.easytrip.easytripbackend.dto.GuesthouseResponseDTO;
 import org.easytrip.easytripbackend.exception.InvalidCredentialsException;
 import org.easytrip.easytripbackend.exception.UnauthorizedRoleException;
 import org.easytrip.easytripbackend.exception.UserNotFoundException;
 import org.easytrip.easytripbackend.model.ApprovalStatus;
 import org.easytrip.easytripbackend.model.Bus;
 import org.easytrip.easytripbackend.model.BusOperator;
+import org.easytrip.easytripbackend.model.Guesthouse;
 import org.easytrip.easytripbackend.model.Role;
 import org.easytrip.easytripbackend.model.User;
 import org.easytrip.easytripbackend.repository.BusOperatorRepository;
@@ -148,6 +150,19 @@ public class BusService {
         bus.setStatus(ApprovalStatus.REJECTED);
         Bus updatedBus = busRepository.save(bus);
         return mapToResponse(updatedBus);
+    }
+
+
+    public List<BusResponseDTO> getPendingBuses(){
+        logger.info("Fetching all the pending buses");
+        List<Bus> pendingBuses = busRepository.findByStatus(ApprovalStatus.PENDING);
+        return pendingBuses.stream().map(this::mapToResponse).collect(Collectors.toList());
+    }
+
+    public List<BusResponseDTO> getApprovedBuses(){
+        logger.info("Fetching all the approved buses");
+        List<Bus> approvedBuses = busRepository.findByStatus(ApprovalStatus.APPROVED);
+        return approvedBuses.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
     public List<BusResponseDTO> searchBuses(String source, String destination) {

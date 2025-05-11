@@ -127,12 +127,19 @@ public class GuesthouseService {
         return pending.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
+    public List<GuesthouseResponseDTO> getApprovedGuesthouses(){
+        logger.info("Fetching all approved guesthouses");
+        List<Guesthouse> approved = guesthouseRepository.findByStatus(ApprovalStatus.APPROVED);
+        return approved.stream().map(this::mapToResponse).collect(Collectors.toList());
+    }
+
     //Get guesthouse by ID
     public GuesthouseResponseDTO getGuesthouseById(Long id) {
         logger.info("Fetching guesthouse by ID: {}", id);
         Guesthouse guesthouse= guesthouseRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
         return mapToResponse(guesthouse);
     }
+
     //Get all guesthouse
     public List<GuesthouseResponseDTO> getAllGuesthouses() {
         logger.info("Fetching all guesthouses");
