@@ -6,12 +6,15 @@ import org.easytrip.easytripbackend.dto.BusBookingRequestDTO;
 import org.easytrip.easytripbackend.dto.BusBookingResponseDTO;
 import org.easytrip.easytripbackend.exception.UnauthorizedRoleException;
 import org.easytrip.easytripbackend.exception.UserNotFoundException;
+import org.easytrip.easytripbackend.model.ApprovalStatus;
 import org.easytrip.easytripbackend.model.Booking;
+import org.easytrip.easytripbackend.model.Bus;
 import org.easytrip.easytripbackend.model.BusBooking;
 import org.easytrip.easytripbackend.model.BusSchedule;
 import org.easytrip.easytripbackend.model.Role;
 import org.easytrip.easytripbackend.model.User;
 import org.easytrip.easytripbackend.repository.BusBookingRepository;
+import org.easytrip.easytripbackend.repository.BusRepository;
 import org.easytrip.easytripbackend.repository.BusScheduleRepository;
 import org.easytrip.easytripbackend.repository.UserRepository;
 import org.slf4j.Logger;
@@ -29,8 +32,92 @@ import java.util.stream.Collectors;
 
 @Service
 public class BusBookingService {
+        private static final Logger logger = LoggerFactory.getLogger(BusBookingService.class);
 
-}
+        @Autowired
+        private BusBookingRepository busBookingRepository;
+
+        @Autowired
+        private BusRepository busRepository;
+
+        @Autowired
+        private UserRepository userRepository;
+
+        public BusBookingResponseDTO bookBus(BusBookingRequestDTO request, Long clientId) {
+            logger.info("Client ID: {} booking bus ID: {}", clientId, request.getBusId());
+            User client = userRepository.findById(clientId)
+                    .orElseThrow(() -> new RuntimeException("Client not found"));
+
+            if (!client.getRole().equals(Role.CLIENT)) {
+                throw new RuntimeException("User is not a client");
+            }
+
+            Bus bus = busRepository.findById(request.getBusId())
+                    .orElseThrow(() -> new RuntimeException("Bus not found"));
+
+            if (!bus.getStatus().equals(ApprovalStatus.APPROVED)) {
+                throw new RuntimeException("Bus is not approved");
+            }
+
+            if (bus.getDepartureTime().isBefore(LocalDateTime.now())) {
+                throw new RuntimeException("Bus is not operational (departure time has passed)");
+            }
+
+            if (request.getSeatsBooked() > bus.getTotalSeats()) {
+                throw new RuntimeException("Not enough seats available");
+            }
+
+            BusBooking booking = new BusBooking();
+            booking.setClient(client);
+            booking.setBus(bus);
+            booking.setSeatsBooked(request.getSeatsBooked());
+            booking.setBookingTime(LocalDateTime.now());
+            booking.setCancelled(false);
+
+            BusBooking savedBooking = busBookingRepository.save(booking);
+            return mapToResponse(savedBooking);
+        }
+
+        public BusBookingResponseDTO cancelBooking(Long bookingId, Long clientId) {
+            logger.info("Client ID: {} cancelling booking ID: {}", clientId, bookingId);
+            BusBooking booking = busBookingRepository.findById(bookingId)
+                    .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+            User client = userRepository.findById(clientId)
+                    .orElseThrow(() -> new RuntimeException("Client not found"));
+
+            if(!booking.getClient().equals(client)) {
+                logger.info("Client ID: {} cancelling booking ID: {}", clientId, bookingId);
+                throw new RuntimeException("Booking is not a client");
+            }
+//            if (!booking.getClient().getId().equals(client- orElseThrow(() -> new RuntimeException("Unauthorized to cancel this booking");
+
+            booking.setCancelled(true);
+            BusBooking updatedBooking = busBookingRepository.save(booking);
+            return mapToResponse(updatedBooking);
+        }
+
+        public List<BusBookingResponseDTO> getClientBookings(Long clientId) {
+            logger.info("Fetching bookings for client ID: {}", clientId);
+            return busBookingRepository.findByClientIdAndIsCancelledFalse(clientId)
+                    .stream()
+                    .map(this::mapToResponse)
+                    .collect(Collectors.toList());
+        }
+
+        private BusBookingResponseDTO mapToResponse(BusBooking booking) {
+            BusBookingResponseDTO response = new BusBookingResponseDTO();
+            response.setId(booking.getId());
+            response.setClientId(booking.getClient().getId());
+            response.setBusId(booking.getBus().getId());
+            response.setBookingTime(booking.getBookingTime());
+            response.setSeatsBooked(booking.getSeatsBooked());
+            response.setCancelled(booking.isCancelled());
+            return response;
+        }
+    }
+
+
 //    private static final Logger logger = LoggerFactory.getLogger(BusBookingService.class);
 //    @Autowired
 //    private BusBookingRepository busBookingRepository;
