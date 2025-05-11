@@ -1,9 +1,11 @@
 package org.easytrip.easytripbackend.service;
 
+import org.easytrip.easytripbackend.dto.GuesthouseResponseDTO;
 import org.easytrip.easytripbackend.dto.LoginRequest;
 import org.easytrip.easytripbackend.dto.RegisterRequest;
 import org.easytrip.easytripbackend.exception.InvalidCredentialsException;
 import org.easytrip.easytripbackend.exception.UserNotFoundException;
+import org.easytrip.easytripbackend.model.Guesthouse;
 import org.easytrip.easytripbackend.model.Role;
 import org.easytrip.easytripbackend.model.User;
 import org.easytrip.easytripbackend.repository.UserRepository;
@@ -166,7 +168,15 @@ public class AuthService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
-
+//    public List<GuesthouseResponseDTO> getAllGuesthouses() {
+//        logger.info("Fetching all guesthouses");
+//        List<Guesthouse> guesthouses = guesthouseRepository.findAll();
+//        if(guesthouses.isEmpty()){
+//            logger.warn("No guesthouses found");
+//            return Collections.emptyList();
+//        }
+//        return guesthouses.stream().map(this::mapToResponse).collect(Collectors.toList());
+//    }
     public List<User> getActiveUsers(boolean isActive) {
         return userRepository.findByIsActive(isActive);
     }

@@ -78,13 +78,13 @@ public class BusController {
 
 
     @Operation(summary = "Get Pending buses", description = "Allows a  ADMIN to view all the pending buses")
-    @GetMapping
+    @GetMapping("/pending")
     public ResponseEntity<List<BusResponseDTO>> getPendingBuses(){
         return ResponseEntity.ok(busService.getPendingBuses());
     }
 
     @Operation(summary = "Get Approved buses", description = "Allows a  ADMIN to view all the Approved buses")
-    @GetMapping
+    @GetMapping("/approved")
     public ResponseEntity<List<BusResponseDTO>> getApprovedBuses(){
         return ResponseEntity.ok(busService.getApprovedBuses());
     }
