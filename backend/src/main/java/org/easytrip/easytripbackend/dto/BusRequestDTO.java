@@ -7,22 +7,54 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import org.easytrip.easytripbackend.model.BusType;
 import org.springframework.web.multipart.MultipartFile;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+
+
+import java.time.LocalDateTime;
+
 
 @Data
-@Schema(description = "Request DTO for bus registration")
+@Schema(name = "BusRequestDTO", description = "DTO for registering or updating a bus")
 public class BusRequestDTO {
-    @NotBlank(message = "Bus name is required")
-    @Schema(description = "Name of the bus", example = "Volvo AC Sleeper")
+
+    @NotBlank
+    @Schema(description = "Name of the bus", example = "Mountain Express")
     private String name;
 
-    @NotNull(message = "Bus type is required")
-    @Schema(description = "Type of the bus", example = "AC_SLEEPER")
+    @NotBlank
+    @Schema(description = "Owner's full name", example = "Dipesh Ghimire")
+    private String ownerName;
+
+    @NotBlank
+    @Schema(description = "Owner's phone number", example = "+9779800000000")
+    private String ownerPhone;
+
+    @Schema(description = "Type of bus (e.g. LUXURY, STANDARD)", example = "LUXURY")
     private BusType busType;
 
-    @Positive(message = "Total seats must be positive")
-    @Schema(description = "Total number of seats in the bus", example = "40")
+    @Schema(description = "Total number of seats in the bus", example = "45")
     private int totalSeats;
 
-    @Schema(description = "Verified document image file")
-    private MultipartFile verifiedDocumentImage;
+    @NotBlank
+    @Schema(description = "Source location", example = "Kathmandu")
+    private String source;
+
+    @NotBlank
+    @Schema(description = "Destination location", example = "Pokhara")
+    private String destination;
+
+    @Schema(description = "Scheduled departure time (ISO format)", example = "2025-06-01T08:00:00")
+    private LocalDateTime departureTime;
+
+    @Schema(description = "Expected arrival time (ISO format)", example = "2025-06-01T14:00:00")
+    private LocalDateTime arrivalTime;
+
+    @NotBlank
+    @Schema(description = "Verification document (PDF/image)", type = "string", format = "binary")
+    private MultipartFile verifiedDocument;
+
+    @Schema(description = "Additional description or notes about the bus", example = "Comfortable AC coach with WiFi")
+    private String description;
 }

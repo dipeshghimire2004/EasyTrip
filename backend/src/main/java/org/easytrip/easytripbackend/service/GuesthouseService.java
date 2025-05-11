@@ -51,8 +51,7 @@ public class GuesthouseService {
            throw new InvalidCredentialsException("User must have ROLE_HOTEL_MANAGER");
         }
 
-        //validate amenities set to empty string if null
-//        String amenities = requestDTO.getAmenities();
+
         String documentPath = fileStorageService.uploadFile(requestDTO.getVerifiedDocument(), owner.getId());
         Guesthouse guestHouse = new Guesthouse();
         guestHouse.setName(requestDTO.getName());
@@ -60,9 +59,8 @@ public class GuesthouseService {
         guestHouse.setContactDetails(requestDTO.getContactDetails());
         guestHouse.setDescription(requestDTO.getDescription());
         guestHouse.setAmenities(requestDTO.getAmenities());
-        guestHouse.setVerifiedDocument(documentPath);
+        guestHouse.setVerifiedDocumentImage(documentPath);
         guestHouse.setOwner(owner);
-//        room.setPricePerNight(requestDTO.getPricePerNight());
 
         logger.info("Received amenities: {}", requestDTO.getAmenities());
         Guesthouse savedGuestHouse = guesthouseRepository.save(guestHouse);
@@ -107,7 +105,7 @@ public class GuesthouseService {
         }
         if(requestDTO.getVerifiedDocument()!=null && !requestDTO.getVerifiedDocument().isEmpty()){
             String documentPath = fileStorageService.uploadFile(requestDTO.getVerifiedDocument(), currentUser.getId());
-            existingGuesthouse.setVerifiedDocument(documentPath);
+            existingGuesthouse.setVerifiedDocumentImage(documentPath);
             //if document is updated, set status back to pending for admin review
             existingGuesthouse.setStatus(ApprovalStatus.PENDING);
         }
@@ -202,7 +200,7 @@ public class GuesthouseService {
         responseDTO.setName(guesthouse.getName());
         responseDTO.setLocation(guesthouse.getLocation());
         responseDTO.setContactDetails(guesthouse.getContactDetails());
-        responseDTO.setVerifiedDocument(guesthouse.getVerifiedDocument());
+        responseDTO.setVerifiedDocument(guesthouse.getVerifiedDocumentImage());
         responseDTO.setDescription(guesthouse.getDescription());
         responseDTO.setAmenities(guesthouse.getAmenities());
         responseDTO.setStatus(guesthouse.getStatus().name());

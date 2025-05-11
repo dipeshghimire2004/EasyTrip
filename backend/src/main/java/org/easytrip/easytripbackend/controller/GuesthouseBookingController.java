@@ -29,7 +29,7 @@ import java.util.ConcurrentModificationException;
 @RestController
 @RequestMapping("/api/bookings")
 @Tag(name = "Booking API", description = "Endpoints for booking guesthouses")
-public class BookingController {
+public class GuesthouseBookingController {
     @Autowired
     private GuesthouseBookingService guesthouseBookingService;
 

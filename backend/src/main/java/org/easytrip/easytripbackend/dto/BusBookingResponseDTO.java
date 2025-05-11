@@ -6,10 +6,9 @@ import java.time.LocalDateTime;
 @Data
 public class BusBookingResponseDTO {
     private Long id;
-    private Long scheduleId;
     private Long clientId;
-    private int numberOfSeats;
-    private double totalFare;
+    private Long busId;
     private LocalDateTime bookingTime;
+    private int seatsBooked;
     private boolean isCancelled;
 }

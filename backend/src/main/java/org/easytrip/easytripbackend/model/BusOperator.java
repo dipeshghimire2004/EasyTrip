@@ -12,7 +12,7 @@ public class BusOperator {
     private String companyName;
     private String contactInfo;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
+    @OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 }

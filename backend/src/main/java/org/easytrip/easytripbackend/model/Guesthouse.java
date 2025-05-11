@@ -30,7 +30,7 @@ public class Guesthouse {
     private List<String> amenities;
 
     @Column(nullable=false)
-    private String verifiedDocument;
+    private String verifiedDocumentImage;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

@@ -12,6 +12,10 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Table(name="users")
+@NamedQuery(
+        name = "User.findByEmail",
+        query = "SELECT u FROM User u WHERE u.email = :email"
+)
 public class User {
 
 
@@ -43,4 +47,9 @@ public class User {
 
     @Column(nullable=false)
     private boolean isActive=true;
+
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private BusOperator busOperator;
+
 }

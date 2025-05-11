@@ -12,9 +12,9 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
 @Service
-public class NotificationService {
+public class GuesthouseNotificationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
+    private static final Logger logger = LoggerFactory.getLogger(GuesthouseNotificationService.class);
 
     @Autowired
     private JavaMailSender mailSender;

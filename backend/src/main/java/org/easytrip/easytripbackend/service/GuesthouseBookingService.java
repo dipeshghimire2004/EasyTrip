@@ -21,8 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class GuesthouseBookingService {
@@ -46,7 +49,7 @@ public class GuesthouseBookingService {
     private RoomRepository roomRepository;
 
     @Autowired
-    private NotificationService notificationService;
+    private GuesthouseNotificationService guesthouseNotificationService;
 
     @Transactional
     public BookingResponseDTO bookGuesthouse(BookingRequestDTO request) {
@@ -111,7 +114,7 @@ public class GuesthouseBookingService {
         //notify the gueshouseowner
         User owner = authService.findByUserId(guesthouse.getOwner().getId());
         if(owner != null && owner.getRole().contains(Role.HOTEL_MANAGER)) {
-            notificationService.sendBookingNotification(
+            guesthouseNotificationService.sendBookingNotification(
                     owner.getEmail(),
                     guesthouse.getName(),
                     traveler.getName(),
@@ -125,6 +128,27 @@ public class GuesthouseBookingService {
         }
         return mapToResponseDto(savedBooking);
     }
+
+    public BookingResponseDTO getAllGuesthouseBookings() {
+        logger.info("Fetching all bookings");
+        List<Booking> bookings = bookingRepository.findAll();
+        if(bookings.isEmpty()){
+            logger.info("No bookings found");
+            return null;
+        }
+        return bookings.stream().map(this::mapToResponseDto).collect(Collectors.toList()).get(0);
+    }
+
+
+
+//     logger.info("Fetching all guesthouses");
+//    List<Guesthouse> guesthouses = guesthouseRepository.findAll();
+//        if(guesthouses.isEmpty()){
+//        logger.warn("No guesthouses found");
+//        return Collections.emptyList();
+//    }
+//        return guesthouses.stream().map(this::mapToResponse).collect(Collectors.toList());
+//}
 
     public BookingResponseDTO cancelBooking(Long bookingId) {
         String email= SecurityContextHolder.getContext().getAuthentication().getName();
@@ -163,7 +187,7 @@ public class GuesthouseBookingService {
             Guesthouse guesthouse = updatedBooking.getGuesthouse();
             User owner = authService.findByUserId(guesthouse.getOwner().getId());
             if (owner != null && owner.getRole() != null && owner.getRole().contains(Role.HOTEL_MANAGER)) {
-                notificationService.sendCancellationNotification(
+                guesthouseNotificationService.sendCancellationNotification(
                         owner.getEmail(),
                         guesthouse.getName(),
                         traveler.getName(),

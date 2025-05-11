@@ -11,15 +11,19 @@ public class BusBooking {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "schedule_id")
-    private BusSchedule schedule;
-
-    @ManyToOne
-    @JoinColumn(name = "client_id")
+    @JoinColumn(name = "client_id", nullable = false)
     private User client;
 
-    private int numberOfSeats;
-    private double totalFare;
+    @ManyToOne
+    @JoinColumn(name = "bus_id", nullable = false)
+    private Bus bus;
+
+    @Column(nullable = false)
     private LocalDateTime bookingTime;
-    private boolean isCancelled;
+
+    @Column(nullable = false)
+    private int seatsBooked;
+
+    @Column(nullable = false)
+    private boolean isCancelled = false;
 }

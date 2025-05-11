@@ -15,8 +15,11 @@ public interface UserRepository  extends JpaRepository<User, Long> {
     List<User> findByRole(Role role);
     List<User> findByIsActive(boolean isActive);
 
-    @Query("SELECT u FROM User u LEFT JOIN FETCH u.role WHERE u.email= :email")
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.role WHERE u.email = :email")
     Optional<User> findByEmailWithRoles(@Param("email") String email);
+
+    @Query("SELECT COUNT(u) FROM User u WHERE u.email = :email")
+    long countByEmailWithRoles(@Param("email") String email);
 }
 
 
