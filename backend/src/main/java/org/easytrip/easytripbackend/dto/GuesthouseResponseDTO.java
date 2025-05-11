@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.easytrip.easytripbackend.model.User;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Schema(description = "Response body for guesthouse registration")
@@ -18,7 +19,7 @@ public class GuesthouseResponseDTO {
     private String location;
     private String contactDetails;
     private String description;
-    private List<String> amenities;
+    private Set<String> amenities;
     private String verifiedDocument;
     private Long ownerId;
     private String ownerName;
