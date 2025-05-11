@@ -14,47 +14,45 @@ import java.time.LocalDateTime;
 
 import java.time.LocalDateTime;
 
-
 @Data
-@Schema(name = "BusRequestDTO", description = "DTO for registering or updating a bus")
 public class BusRequestDTO {
-
     @NotBlank
-    @Schema(description = "Name of the bus", example = "Mountain Express")
+    @Schema(description = "Name of the bus", example = "City Express")
     private String name;
 
     @NotBlank
-    @Schema(description = "Owner's full name", example = "Dipesh Ghimire")
+    @Schema(description = "Name of the bus owner", example = "John Doe")
     private String ownerName;
 
     @NotBlank
-    @Schema(description = "Owner's phone number", example = "+9779800000000")
+    @Schema(description = "Phone number of the bus owner", example = "1234567890")
     private String ownerPhone;
 
-    @Schema(description = "Type of bus (e.g. LUXURY, STANDARD)", example = "LUXURY")
+    @NotNull
+    @Schema(description = "Type of bus (AC, NON_AC, SLEEPER)", example = "AC")
     private BusType busType;
 
-    @Schema(description = "Total number of seats in the bus", example = "45")
-    private int totalSeats;
+    @NotNull
+    @Schema(description = "Total number of seats", example = "40")
+    private Integer totalSeats;
 
     @NotBlank
-    @Schema(description = "Source location", example = "Kathmandu")
+    @Schema(description = "Starting location", example = "New York")
     private String source;
 
     @NotBlank
-    @Schema(description = "Destination location", example = "Pokhara")
+    @Schema(description = "Destination location", example = "Boston")
     private String destination;
 
-    @Schema(description = "Scheduled departure time (ISO format)", example = "2025-06-01T08:00:00")
+    @NotNull
+    @Schema(description = "Departure date and time", example = "2025-05-12T10:00:00")
     private LocalDateTime departureTime;
 
-    @Schema(description = "Expected arrival time (ISO format)", example = "2025-06-01T14:00:00")
+    @NotNull
+    @Schema(description = "Arrival date and time", example = "2025-05-12T14:00:00")
     private LocalDateTime arrivalTime;
 
-    @NotBlank
+    @NotNull
     @Schema(description = "Verification document (PDF/image)", type = "string", format = "binary")
     private MultipartFile verifiedDocument;
-
-    @Schema(description = "Additional description or notes about the bus", example = "Comfortable AC coach with WiFi")
-    private String description;
 }
