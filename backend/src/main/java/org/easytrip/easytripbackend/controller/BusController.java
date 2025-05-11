@@ -1,30 +1,19 @@
 package org.easytrip.easytripbackend.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.easytrip.easytripbackend.dto.BusBookingRequestDTO;
 import org.easytrip.easytripbackend.dto.BusBookingResponseDTO;
 import org.easytrip.easytripbackend.dto.BusRequestDTO;
 import org.easytrip.easytripbackend.dto.BusResponseDTO;
-import org.easytrip.easytripbackend.dto.BusScheduleRequestDTO;
-import org.easytrip.easytripbackend.dto.BusScheduleResponseDTO;
-import org.easytrip.easytripbackend.dto.BusScheduleSearchRequestDTO;
-import org.easytrip.easytripbackend.dto.BusScheduleSearchResponseDTO;
-import org.easytrip.easytripbackend.dto.GuesthouseResponseDTO;
-import org.easytrip.easytripbackend.model.Bus;
 import org.easytrip.easytripbackend.service.BusBookingService;
-import org.easytrip.easytripbackend.service.BusScheduleService;
 import org.easytrip.easytripbackend.service.BusService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,15 +26,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-
-
-import java.util.List;
-
 
 
 @RestController
@@ -129,27 +112,27 @@ public class BusController {
 
     @Operation(summary = "Book a bus", description = "Allows a CLIENT to book seats on a bus")
     @ApiResponse(responseCode = "200", description = "Booking created successfully", content = @Content(schema = @Schema(implementation = BusBookingResponseDTO.class)))
+    @PreAuthorize("hasRole('CLIENT')")
     @PostMapping("/book")
     public ResponseEntity<BusBookingResponseDTO> bookBus(
-            @Valid @RequestBody BusBookingRequestDTO request,
-            @Parameter(description = "ID of the client") @RequestParam Long clientId) {
-        return ResponseEntity.ok(busBookingService.bookBus(request, clientId));
+            @Valid @RequestBody BusBookingRequestDTO request) {
+        return ResponseEntity.ok(busBookingService.bookBus(request));
     }
 
     @Operation(summary = "Cancel a booking", description = "Allows a CLIENT to cancel their booking")
     @ApiResponse(responseCode = "200", description = "Booking cancelled successfully", content = @Content(schema = @Schema(implementation = BusBookingResponseDTO.class)))
+    @PreAuthorize("hasRole('CLIENT')")
     @PutMapping("/bookings/{bookingId}/cancel")
     public ResponseEntity<BusBookingResponseDTO> cancelBooking(
-            @Parameter(description = "ID of the booking to cancel") @PathVariable Long bookingId,
-            @Parameter(description = "ID of the client") @RequestParam Long clientId) {
-        return ResponseEntity.ok(busBookingService.cancelBooking(bookingId, clientId));
+            @Parameter(description = "ID of the booking to cancel") @PathVariable Long bookingId) {
+        return ResponseEntity.ok(busBookingService.cancelBooking(bookingId));
     }
 
     @Operation(summary = "View client bookings", description = "Allows a CLIENT to view their active bookings")
     @ApiResponse(responseCode = "200", description = "List of client bookings", content = @Content(schema = @Schema(implementation = BusBookingResponseDTO.class)))
+    @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("/bookings")
-    public ResponseEntity<List<BusBookingResponseDTO>> getClientBookings(
-            @Parameter(description = "ID of the client") @RequestParam Long clientId) {
-        return ResponseEntity.ok(busBookingService.getClientBookings(clientId));
+    public ResponseEntity<List<BusBookingResponseDTO>> getClientBookings() {
+        return ResponseEntity.ok(busBookingService.getClientBookings());
     }
 }

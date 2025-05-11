@@ -48,6 +48,9 @@ public class Bus {
     @Column(nullable = false)
     private ApprovalStatus status = ApprovalStatus.PENDING;
 
+    @Column(nullable = false)
+    private Double farePerSeat;
+
     @ManyToOne
     @JoinColumn(name = "operator_id", nullable = false)
     private User operator;

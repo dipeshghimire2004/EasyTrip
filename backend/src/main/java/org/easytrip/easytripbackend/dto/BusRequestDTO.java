@@ -53,6 +53,10 @@ public class BusRequestDTO {
     private LocalDateTime arrivalTime;
 
     @NotNull
+    @Schema(description = "Fare per seat in USD", example = "50.00")
+    private Double farePerSeat;
+
+    @NotNull
     @Schema(description = "Verification document (PDF/image)", type = "string", format = "binary")
     private MultipartFile verifiedDocument;
 }

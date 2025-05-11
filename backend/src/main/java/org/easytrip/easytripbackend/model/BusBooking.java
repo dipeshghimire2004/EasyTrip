@@ -26,4 +26,8 @@
 
         @Column(nullable = false)
         private boolean isCancelled = false;
+
+        @Enumerated(EnumType.STRING)
+        @Column(nullable = false)
+        private PaymentMethod paymentMethod;
     }

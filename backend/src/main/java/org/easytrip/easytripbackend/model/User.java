@@ -49,7 +49,7 @@ public class User {
     private boolean isActive=true;
 
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private BusOperator busOperator;
+//    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    private BusOperator busOperator;
 
 }
