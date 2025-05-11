@@ -2,17 +2,10 @@ package org.easytrip.easytripbackend.service;
 
 import org.easytrip.easytripbackend.dto.BusRequestDTO;
 import org.easytrip.easytripbackend.dto.BusResponseDTO;
-import org.easytrip.easytripbackend.dto.GuesthouseResponseDTO;
-import org.easytrip.easytripbackend.exception.InvalidCredentialsException;
-import org.easytrip.easytripbackend.exception.UnauthorizedRoleException;
-import org.easytrip.easytripbackend.exception.UserNotFoundException;
 import org.easytrip.easytripbackend.model.ApprovalStatus;
 import org.easytrip.easytripbackend.model.Bus;
-import org.easytrip.easytripbackend.model.BusOperator;
-import org.easytrip.easytripbackend.model.Guesthouse;
 import org.easytrip.easytripbackend.model.Role;
 import org.easytrip.easytripbackend.model.User;
-import org.easytrip.easytripbackend.repository.BusOperatorRepository;
 import org.easytrip.easytripbackend.repository.BusRepository;
 import org.easytrip.easytripbackend.repository.UserRepository;
 import org.slf4j.Logger;
@@ -20,13 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -68,6 +54,7 @@ public class BusService {
         bus.setDepartureTime(request.getDepartureTime());
         bus.setArrivalTime(request.getArrivalTime());
         bus.setVerifiedDocumentImage(documentPath);
+        bus.setFarePerSeat(request.getFarePerSeat());
         bus.setStatus(ApprovalStatus.PENDING);
         bus.setOperator(operator);
 
@@ -98,6 +85,7 @@ public class BusService {
         bus.setDepartureTime(request.getDepartureTime());
         bus.setArrivalTime(request.getArrivalTime());
         bus.setVerifiedDocumentImage(documentPath);
+        bus.setFarePerSeat(request.getFarePerSeat());
 
         Bus updatedBus = busRepository.save(bus);
         return mapToResponse(updatedBus);
@@ -199,6 +187,7 @@ public class BusService {
         response.setDepartureTime(bus.getDepartureTime());
         response.setArrivalTime(bus.getArrivalTime());
         response.setVerifiedDocumentImage(bus.getVerifiedDocumentImage());
+        response.setFarePerSeat(bus.getFarePerSeat());
         response.setStatus(bus.getStatus());
         response.setOperatorId(bus.getOperator().getId());
         return response;
