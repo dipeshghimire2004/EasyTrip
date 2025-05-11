@@ -179,14 +179,21 @@ public class GuesthouseService {
         }
     }
 
+    @Transactional
     public GuesthouseResponseDTO rejectGuesthouse(long guesthouseId) {
-        Guesthouse guesthouse = guesthouseRepository.findById(guesthouseId)
-                .orElseThrow(() -> new RuntimeException("Guesthouse not found"));
-        guesthouse.setStatus(ApprovalStatus.REJECTED);
-        Guesthouse saved = guesthouseRepository.save(guesthouse);
-        logger.info("Rejected guesthouse with id {}" , guesthouseId);
-        // TODO: Send email notification to owner
-        return mapToResponse(saved);
+        try{
+            Guesthouse guesthouse = guesthouseRepository.findById(guesthouseId)
+                    .orElseThrow(() -> new RuntimeException("Guesthouse not found"));
+            guesthouse.setStatus(ApprovalStatus.REJECTED);
+            Guesthouse saved = guesthouseRepository.save(guesthouse);
+            logger.info("Rejected guesthouse with id {}" , guesthouseId);
+            return mapToResponse(saved);
+        }
+        catch(Exception e){
+            logger.error("Failed to reject guesthouse {}: {}", guesthouseId, e.getMessage(), e);
+            throw e;
+        }
+
     }
 
     public Guesthouse getGuesthouseById(long guesthouseId) {

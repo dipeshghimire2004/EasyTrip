@@ -166,19 +166,12 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserResponseDTO> getDeactiveUsers(boolean isActive) {
+        return userRepository.findByIsActive(isActive).stream()
+                .map(this::mapToUserResponseDTO)
+                .collect(Collectors.toList());
     }
 
-//    public List<GuesthouseResponseDTO> getAllGuesthouses() {
-//        logger.info("Fetching all guesthouses");
-//        List<Guesthouse> guesthouses = guesthouseRepository.findAll();
-//        if(guesthouses.isEmpty()){
-//            logger.warn("No guesthouses found");
-//            return Collections.emptyList();
-//        }
-//        return guesthouses.stream().map(this::mapToResponse).collect(Collectors.toList());
-//    }
     public List<UserResponseDTO> getActiveUsers(boolean isActive) {
         return userRepository.findByIsActive(isActive).stream()
             .map(this::mapToUserResponseDTO)

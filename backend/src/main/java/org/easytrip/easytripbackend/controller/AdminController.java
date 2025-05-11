@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.easytrip.easytripbackend.model.User;
+import org.easytrip.easytripbackend.model.UserResponseDTO;
 import org.easytrip.easytripbackend.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -65,8 +66,8 @@ public class AdminController {
             @ApiResponse(responseCode = "200", description = "List of users retrieved successfully"),
             @ApiResponse(responseCode = "403", description = "Forbidden - Requires ADMIN role")
     })
-    public ResponseEntity<List<User>> getAllUsers(@Parameter(description = "Filter users by active status (true/false)", required = false) @RequestParam(required = false, defaultValue="true") boolean isActive){
-        return ResponseEntity.ok(authService.getAllUsers());
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers(@Parameter(description = "Filter users by active status (true/false)", required = false) @RequestParam(required = false, defaultValue="true") boolean isActive){
+        return ResponseEntity.ok(authService.getActiveUsers(true));
     }
 
     @GetMapping("/dashboard")

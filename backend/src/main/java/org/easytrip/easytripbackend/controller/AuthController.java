@@ -61,15 +61,14 @@ public class AuthController {
 
 
     @GetMapping()
-    @Operation(summary =" Get users ")
-    @ApiResponse(responseCode = "200", description = "Users lists")
-    public ResponseEntity<List<User>> getUsers() {
-        List <User> users = authService.getAllUsers();
-        return ResponseEntity.ok(users);
+    @Operation(summary =" Get Inactive users ")
+    @ApiResponse(responseCode = "200", description = "Inactive Users lists")
+    public ResponseEntity<List<UserResponseDTO>> getInactiveUsers() {
+       return ResponseEntity.ok(authService.getDeactiveUsers(false));
     }
 
     @GetMapping("/users/active")
-    @Operation(summary =" Get users ")
+    @Operation(summary =" Get active users ")
     @ApiResponse(responseCode = "200", description = "Users lists")
     public ResponseEntity<List<UserResponseDTO>> getActiveUsers() {
         return ResponseEntity.ok(authService.getActiveUsers(true));
