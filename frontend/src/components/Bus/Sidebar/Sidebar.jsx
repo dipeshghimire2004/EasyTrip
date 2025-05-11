@@ -7,18 +7,18 @@ const Sidebar = () => {
       <h1 className="text-xl font-bold mb-6">EasyTrip Dashboard</h1>
       <ul className="space-y-4">
         <li>
-          <Link to="/BUS_OWNER/dashboard" className="text-gray-700 hover:text-blue-600">
+          <Link to="/BUS_OPERATOR/dashboard" className="text-gray-700 hover:text-blue-600">
             Dashboard
           </Link>
         </li>
         <li>
-          <Link to="/BUS_OWNER/listing" className="text-gray-700 hover:text-blue-600">
+          <Link to="/BUS_OPERATOR/listing" className="text-gray-700 hover:text-blue-600">
             My Listings
           </Link>
         </li>
         <li>
-          <Link to="/BUS_OWNER/bookings" className="text-gray-700 hover:text-blue-600">
-            Bookings
+          <Link to="/BUS_OPERATOR/manageBuses" className="text-gray-700 hover:text-blue-600">
+            Manage Buses
           </Link>
         </li>
       </ul>
