@@ -27,8 +27,8 @@ import GuestHouseDashboard from "./components/HotelManagerPanel/Dashboard/Dashbo
 import BusOwnerSignUp from "./components/Bus/BusOwnerSignUp/BusOwnerSignUp";
 import BusDashboard from "./components/Bus/BusDashboard/BusDashboard";
 import BusListing from "./components/Bus/BusListing/BusListing";
-import UpadteAvailability from "./components/Bus/UpdateAvailability/UpdateAvailability";
 import UpdateAvailability from "./components/Bus/UpdateAvailability/UpdateAvailability";
+import ManageBuses from "./components/Bus/ManageBuses/ManageBuses";
 
 function ProtectedRoute({ element, userRole, allowedRoles }) {
   if (!allowedRoles.includes(userRole)) {
@@ -48,6 +48,7 @@ function App() {
   return (
     <Router>
       <Routes>
+
         {/* All */}
         <Route path="/" element={<Home />} />
         <Route path="/booking" element={<HotelBookingUI />} />
@@ -73,11 +74,14 @@ function App() {
         <Route path="/HOTEL_MANAGER/addGuestHouse" element={<ProtectedRoute element={<AddGuestHouseForm />} userRole={userRole} allowedRoles={["HOTEL_MANAGER"]} />} />
         <Route path="/HOTEL_MANAGER/guestHouseOverview" element={<ProtectedRoute element={<GuestHouseOverview />} userRole={userRole} allowedRoles={["HOTEL_MANAGER"]} />} />
 
-        {/* Bus Owner Routes */}
-        <Route path="/BUS_OWNER/signup" element={<BusOwnerSignUp role="BUS_OWNER" />} />
-        <Route path="/BUS_OWNER/dashboard" element={<BusDashboard role="BUS_OWNER" />} />
-        <Route path="/BUS_OWNER/listing" element={<BusListing role="BUS_OWNER" />} />
-        <Route path="/BUS_OWNER/updateAvailability" element={<UpdateAvailability role="BUS_OWNER" />} />
+        {/* BUS OPERATOR Routes */}
+        <Route path="/BUS_OPERATOR/signup" element={<Signup role="BUS_OPERATOR" />} />
+        <Route path="/BUS_OPERATOR/login" element={<Login role="BUS_OPERATOR" setUserRole={setUserRole} />} />
+        <Route path="/BUS_OPERATOR/dashboard" element={<BusDashboard role="BUS_OPERATOR" />} />
+        <Route path="/BUS_OPERATOR/listing" element={<BusListing role="BUS_OPERATOR" />} />
+        <Route path="/BUS_OPERATOR/booking" element={<BusListing role="BUS_OPERATOR" />} />
+        <Route path="/BUS_OPERATOR/updateAvailability" element={<UpdateAvailability role="BUS_OPERATOR" />} />
+        <Route path="/BUS_OPERATOR/manageBuses" element={<ManageBuses role="BUS_OPERATOR" />} />
       </Routes>
     </Router>
   );

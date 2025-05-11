@@ -62,6 +62,8 @@ export default function Login({ role = "CLIENT", setUserRole }) {
             navigate("/ADMIN/panel");
           } else if (tokenRole === "HOTEL_MANAGER") {
             navigate("/HOTEL_MANAGER/addGuestHouse");
+          } else if (tokenRole === "BUS_OPERATOR") {
+            navigate("/BUS_OPERATOR/dashboard");
           } else {
             navigate("/booking");
           }
