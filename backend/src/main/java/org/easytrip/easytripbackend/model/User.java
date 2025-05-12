@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -44,6 +46,10 @@ public class User {
     //one-to-many relationship with bookings(for travellers/client)
     @OneToMany(mappedBy="traveler", cascade=CascadeType.ALL, orphanRemoval=true)
     private Set<Booking> bookings;
+
+    @OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
+    @BatchSize(size = 10)
+    private Set<BusBooking> busBookings = new HashSet<>();
 
     @Column(nullable=false)
     private boolean isActive=true;
