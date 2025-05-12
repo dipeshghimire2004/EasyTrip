@@ -6,6 +6,7 @@ const Sidebar = () => {
     { name: "Dashboard", path: "/admin/panel" },
     { name: "Booking Log", path: "/admin/bookinglog" },
     { name: "Approval Log", path: "/admin/approvallog" },
+    { name: "Bus Approval Log", path: "/admin/busApprovallog" },
   ];
 
   return (

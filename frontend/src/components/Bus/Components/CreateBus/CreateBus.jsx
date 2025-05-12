@@ -12,7 +12,8 @@ export default function CreateBus() {
     destination: '',
     departureTime: '',
     arrivalTime: '',
-    verifiedDocument: null
+    verifiedDocument: null,
+    farePerSeat: ''  // Add farePerSeat to the state
   });
 
   const [loading, setLoading] = useState(false);
@@ -53,7 +54,8 @@ export default function CreateBus() {
         destination: '',
         departureTime: '',
         arrivalTime: '',
-        verifiedDocument: null
+        verifiedDocument: null,
+        farePerSeat: ''  // Reset farePerSeat
       });
     } catch (err) {
       console.error('Error:', err); // 👈 Keep this for debugging
@@ -63,12 +65,11 @@ export default function CreateBus() {
     }
   };
 
-
   return (
     <div className="max-w-lg mx-auto p-6 bg-white rounded-2xl shadow-lg">
       <h2 className="text-2xl font-semibold mb-4">Create New Bus</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {[
+        {[ 
           { name: 'name', placeholder: 'Bus Name' },
           { name: 'ownerName', placeholder: 'Owner Name' },
           { name: 'ownerPhone', placeholder: 'Owner Phone' },
@@ -78,6 +79,7 @@ export default function CreateBus() {
           { name: 'destination', placeholder: 'Destination Location' },
           { name: 'departureTime', placeholder: 'Departure Time', type: 'datetime-local' },
           { name: 'arrivalTime', placeholder: 'Arrival Time', type: 'datetime-local' },
+          { name: 'farePerSeat', placeholder: 'Fare per Seat', type: 'number' } // Add farePerSeat input
         ].map(({ name, placeholder, type = 'text' }) => (
           <input
             key={name}
