@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,7 +45,7 @@ public class BusBookingService {
         User client = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Client not found"));
 
-        if (!client.getRole().equals(Role.CLIENT)) {
+        if (!client.getRole().contains(Role.CLIENT)) {
             logger.error("User with email {} is not a CLIENT", email);
             throw new RuntimeException("User is not a client");
         }
@@ -52,7 +53,10 @@ public class BusBookingService {
         Bus bus = busRepository.findById(request.getBusId())
                 .orElseThrow(() -> new RuntimeException("Bus not found"));
 
-        if (!bus.getStatus().equals(ApprovalStatus.APPROVED)) {
+//        if (!bus.getStatus().contains(ApprovalStatus.APPROVED)) {
+//            throw new RuntimeException("Bus is not approved");
+//        }
+        if(!bus.getStatus().equals(ApprovalStatus.APPROVED)){
             throw new RuntimeException("Bus is not approved");
         }
 
@@ -92,13 +96,14 @@ public class BusBookingService {
         return mapToResponse(savedBooking);
     }
 
+    @Transactional
     public BusBookingResponseDTO cancelBooking(Long bookingId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         logger.info("Cancelling booking ID: {} by email: {}", bookingId, email);
         User client = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Client not found"));
 
-        if (!client.getRole().equals(Role.CLIENT)) {
+        if (!client.getRole().contains(Role.CLIENT)) {
             logger.error("User with email {} is not a CLIENT", email);
             throw new RuntimeException("User is not a client");
         }
@@ -111,11 +116,12 @@ public class BusBookingService {
             throw new RuntimeException("Unauthorized to cancel this booking");
         }
 
+        // Update only the cancelled flag to avoid merging User collections
         booking.setCancelled(true);
         BusBooking updatedBooking = busBookingRepository.save(booking);
 
-        // Send notifications
-        Bus bus = booking.getBus();
+        // Send notifications after transaction commits
+        Bus bus = updatedBooking.getBus();
         busNotificationService.sendCancellationNotification(
                 client.getEmail(),
                 bus.getOperator().getEmail(),
@@ -129,6 +135,7 @@ public class BusBookingService {
 
         return mapToResponse(updatedBooking);
     }
+
 
     public List<BusBookingResponseDTO> getClientBookings() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
