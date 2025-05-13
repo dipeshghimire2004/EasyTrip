@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -32,10 +34,17 @@ public class GuesthouseRequestDTO {
     private MultipartFile verifiedDocument;
     private String description;
 
+    private String amenities;
 
-    @Schema(description = "List of amenities", example = "[\"WiFi\", \"Pool\", \"Parking\"]")
-    private Set<String> amenities;
 
-//    private double pricePerNight;
+    //    private double pricePerNight;
     private String status;
+
+
+    public Set<String> getAmenitiesAsSet() {
+        if (amenities == null || amenities.trim().isEmpty()) {
+            return new HashSet<>();
+        }
+        return new HashSet<>(Arrays.asList(amenities.split("\\s*,\\s*")));
+    }
 }

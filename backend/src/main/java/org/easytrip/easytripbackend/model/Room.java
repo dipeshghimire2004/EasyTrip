@@ -39,4 +39,7 @@ public class Room {
 
     @Positive(message="Capacity must be positive")
     private int capacity;
+
+    @Version
+    private Long version;
 }

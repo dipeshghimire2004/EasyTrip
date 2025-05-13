@@ -12,6 +12,8 @@ import org.easytrip.easytripbackend.model.Guesthouse;
 import org.easytrip.easytripbackend.repository.GuesthouseRepository;
 import org.easytrip.easytripbackend.service.FileStorageService;
 import org.easytrip.easytripbackend.service.GuesthouseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
@@ -27,7 +29,7 @@ import java.util.List;
 @RequestMapping("/api/guesthouses")
 @Tag(name = "Guesthouse API", description = "API for guesthouse management")
 public class GuesthouseController {
-
+    private static final Logger logger = LoggerFactory.getLogger(GuesthouseController.class);
     @Autowired
     private GuesthouseService guesthouseService;
 
@@ -54,6 +56,7 @@ public class GuesthouseController {
     })
     public ResponseEntity<GuesthouseResponseDTO> register(@ModelAttribute GuesthouseRequestDTO request) {
         GuesthouseResponseDTO response= guesthouseService.registerGuesthouse(request);
+        logger.info("Received GuesthouseRequestDTO: name={}, amenities={}", request.getName(), request.getAmenities());
 
         return ResponseEntity.ok(response);
     }

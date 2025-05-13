@@ -42,16 +42,16 @@ public class GuesthouseService {
     @Autowired
     private  FileStorageService fileStorageService;
 
+    @Transactional
     public GuesthouseResponseDTO registerGuesthouse(GuesthouseRequestDTO requestDTO) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        logger.info("Registering guesthouse by email: {}" , email);
+        logger.info("Registering guesthouse by email: {}", email);
         User owner = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
-        if(!owner.getRole().contains(Role.HOTEL_MANAGER)){
+        if (!owner.getRole().contains(Role.HOTEL_MANAGER)) {
             logger.error("User with email {} has no role HOTEL_MANAGER", email);
-           throw new InvalidCredentialsException("User must have ROLE_HOTEL_MANAGER");
+            throw new InvalidCredentialsException("User must have ROLE_HOTEL_MANAGER");
         }
-
 
         String documentPath = fileStorageService.uploadFile(requestDTO.getVerifiedDocument(), owner.getId());
         Guesthouse guestHouse = new Guesthouse();
@@ -59,59 +59,57 @@ public class GuesthouseService {
         guestHouse.setLocation(requestDTO.getLocation());
         guestHouse.setContactDetails(requestDTO.getContactDetails());
         guestHouse.setDescription(requestDTO.getDescription());
-        guestHouse.setAmenities(requestDTO.getAmenities());
+        guestHouse.setAmenities(requestDTO.getAmenitiesAsSet()); // Use converted Set
         guestHouse.setVerifiedDocumentImage(documentPath);
         guestHouse.setOwner(owner);
+        guestHouse.setStatus(ApprovalStatus.PENDING);
 
-        logger.info("Received amenities: {}", requestDTO.getAmenities());
+        logger.info("Received amenities: {}", requestDTO.getAmenitiesAsSet());
         Guesthouse savedGuestHouse = guesthouseRepository.save(guestHouse);
         logger.info("Guesthouse registered with ID: {}", savedGuestHouse.getId());
         return mapToResponse(savedGuestHouse);
     }
-    //update guesthouse
+
+    @Transactional
     public GuesthouseResponseDTO updateGuesthouse(GuesthouseRequestDTO requestDTO, Long guesthouseId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        logger.info("Updating guesthouse by email: {}" , email);
+        logger.info("Updating guesthouse by email: {}", email);
 
-        //get the current user
         User currentUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        //Get the existing guesthouse
         Guesthouse existingGuesthouse = guesthouseRepository.findById(guesthouseId)
                 .orElseThrow(() -> new GuesthouseNotFoundException("Guesthouse not found"));
 
-        //check if the current user is admin or owner
         boolean isOwner = currentUser.getId().equals(existingGuesthouse.getOwner().getId());
         boolean isAdmin = currentUser.getRole().contains(Role.ADMIN);
-        if(!isOwner && !isAdmin){
+        if (!isOwner && !isAdmin) {
             logger.error("User with email {} has no role ADMIN or HOTEL_MANAGER", email);
-            throw new InvalidCredentialsException("User must have ROLE_ADMIN or ROLE_MANAGER");
+            throw new InvalidCredentialsException("User must have ROLE_ADMIN or ROLE_HOTEL_MANAGER");
         }
-        //update fields if they are provided in the request
-        if(requestDTO.getName()!=null){
+
+        if (requestDTO.getName() != null) {
             existingGuesthouse.setName(requestDTO.getName());
         }
-        if(requestDTO.getLocation()!=null){
+        if (requestDTO.getLocation() != null) {
             existingGuesthouse.setLocation(requestDTO.getLocation());
         }
-        if(requestDTO.getContactDetails()!=null){
+        if (requestDTO.getContactDetails() != null) {
             existingGuesthouse.setContactDetails(requestDTO.getContactDetails());
         }
-        if(requestDTO.getDescription()!=null){
+        if (requestDTO.getDescription() != null) {
             existingGuesthouse.setDescription(requestDTO.getDescription());
         }
-        if(requestDTO.getAmenities()!=null){
-            existingGuesthouse.setAmenities(requestDTO.getAmenities());
+        if (requestDTO.getAmenities() != null) {
+            existingGuesthouse.setAmenities(requestDTO.getAmenitiesAsSet());
         }
-        if(requestDTO.getVerifiedDocument()!=null && !requestDTO.getVerifiedDocument().isEmpty()){
+        if (requestDTO.getVerifiedDocument() != null && !requestDTO.getVerifiedDocument().isEmpty()) {
             String documentPath = fileStorageService.uploadFile(requestDTO.getVerifiedDocument(), currentUser.getId());
             existingGuesthouse.setVerifiedDocumentImage(documentPath);
-            //if document is updated, set status back to pending for admin review
             existingGuesthouse.setStatus(ApprovalStatus.PENDING);
         }
 
-        if(isAdmin && requestDTO.getStatus()!=null){
+        if (isAdmin && requestDTO.getStatus() != null) {
             existingGuesthouse.setStatus(ApprovalStatus.valueOf(requestDTO.getStatus()));
         }
 

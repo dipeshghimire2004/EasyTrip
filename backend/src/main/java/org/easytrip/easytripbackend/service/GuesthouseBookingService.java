@@ -1,5 +1,6 @@
 package org.easytrip.easytripbackend.service;
 
+import jakarta.persistence.OptimisticLockException;
 import org.easytrip.easytripbackend.dto.BookingRequestDTO;
 import org.easytrip.easytripbackend.dto.BookingResponseDTO;
 import org.easytrip.easytripbackend.dto.BookingUpdateRequestDTO;
@@ -15,6 +16,7 @@ import org.easytrip.easytripbackend.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +52,8 @@ public class GuesthouseBookingService {
 
     @Autowired
     private GuesthouseNotificationService guesthouseNotificationService;
+
+    private static final int MAX_RETRIES = 3;
 
     @Transactional
     public BookingResponseDTO bookGuesthouse(BookingRequestDTO request) {
@@ -129,6 +133,52 @@ public class GuesthouseBookingService {
         return mapToResponseDto(savedBooking);
     }
 
+
+
+    @Transactional
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void updateRoomAvailability() {
+        LocalDate today = LocalDate.now();
+        logger.info("Running room availability update task on {}", today);
+
+        List<Booking> expiredBookings = bookingRepository.findByStatusAndCheckOutDateBefore("CONFIRMED", today);
+        if (expiredBookings.isEmpty()) {
+            logger.info("No expired bookings found");
+            return;
+        }
+
+        for (Booking booking : expiredBookings) {
+            int attempt = 0;
+            while (attempt < MAX_RETRIES) {
+                try {
+                    Room room = booking.getRoom();
+                    if (room != null && !room.isAvailable()) {
+                        room.setAvailable(true);
+                        roomRepository.save(room);
+                        booking.setStatus("COMPLETED");
+                        bookingRepository.save(booking);
+                        logger.info("Set room {} available and marked booking {} as COMPLETED", room.getId(), booking.getId());
+                    }
+                    break; // Success, move to next booking
+                } catch (OptimisticLockException e) {
+                    attempt++;
+                    logger.warn("Concurrent modification detected for booking id {}. Retry attempt {}/{}", booking.getId(), attempt, MAX_RETRIES);
+                    if (attempt == MAX_RETRIES) {
+                        logger.error("Failed to update booking id {} after {} retries", booking.getId(), MAX_RETRIES);
+                        break; // Move to next booking
+                    }
+                    try {
+                        Thread.sleep(100 * attempt);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        logger.error("Retry interrupted", ie);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     public BookingResponseDTO getAllGuesthouseBookings() {
         logger.info("Fetching all bookings");
         List<Booking> bookings = bookingRepository.findAll();
@@ -141,66 +191,40 @@ public class GuesthouseBookingService {
 
 
 
-//     logger.info("Fetching all guesthouses");
-//    List<Guesthouse> guesthouses = guesthouseRepository.findAll();
-//        if(guesthouses.isEmpty()){
-//        logger.warn("No guesthouses found");
-//        return Collections.emptyList();
-//    }
-//        return guesthouses.stream().map(this::mapToResponse).collect(Collectors.toList());
-//}
 
-    public BookingResponseDTO cancelBooking(Long bookingId) {
-        String email= SecurityContextHolder.getContext().getAuthentication().getName();
-        logger.info("Attempting to cancel booking ID: {} by user: {}", bookingId, email);
 
-        User traveler= authService.findByEmail(email);
-        Set<Role> roles= new HashSet<>(traveler.getRole());
-        if(!roles.contains(Role.CLIENT)) {
-            logger.warn("User {} lacks CLIENT role", email);
-            throw new RuntimeException("You are not the client/traveller of this booking");
-        }
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
-
-        //verify ownership
-        if(!booking.getTraveler().getId().equals(traveler.getId())) {
-            logger.warn("User {} attempted to cancel booking ID: {} owned by {}",
-                    email, bookingId, booking.getTraveler().getEmail());
-            throw new RuntimeException("You can only cancel your own booking");
-        }
-
-        //check cancellation policy (e.g. before check-in date
-        if(booking.getCheckInDate().isBefore(LocalDate.now().plusDays(1))) {
-            throw new IllegalArgumentException("Cannot cancel booking less than 24 hours before check-in");
-        }
-
-        if ("CANCELLED".equals(booking.getStatus())) {
-            throw new IllegalArgumentException("Booking is already cancelled");
-        }
-
-        booking.setStatus("CANCELLED");
-        Booking updatedBooking = bookingRepository.save(booking);
-
-        // Notify the guesthouse owner
-        try {
-            Guesthouse guesthouse = updatedBooking.getGuesthouse();
-            User owner = authService.findByUserId(guesthouse.getOwner().getId());
-            if (owner != null && owner.getRole() != null && owner.getRole().contains(Role.HOTEL_MANAGER)) {
-                guesthouseNotificationService.sendCancellationNotification(
-                        owner.getEmail(),
-                        guesthouse.getName(),
-                        traveler.getName(),
-                        updatedBooking.getCheckInDate().toString(),
-                        updatedBooking.getCheckOutDate().toString()
-                );
-            } else {
-                logger.warn("No valid owner found for guesthouse ID: {}", guesthouse.getId());
+    @Transactional
+    public void cancelBooking(Long bookingId) {
+        int attempt = 0;
+        while (attempt < MAX_RETRIES) {
+            try {
+                Booking booking = bookingRepository.findById(bookingId)
+                        .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
+                if (!booking.getStatus().equals("CONFIRMED")) {
+                    throw new IllegalStateException("Only CONFIRMED bookings can be cancelled");
+                }
+                Room room = booking.getRoom();
+                room.setAvailable(true);
+                booking.setStatus("CANCELLED");
+                roomRepository.save(room);
+                bookingRepository.save(booking);
+                logger.info("Cancelled booking with id {}", bookingId);
+                return; // Success, exit the loop
+            } catch (OptimisticLockException e) {
+                attempt++;
+                logger.warn("Concurrent modification detected for booking id {}. Retry attempt {}/{}", bookingId, attempt, MAX_RETRIES);
+                if (attempt == MAX_RETRIES) {
+                    logger.error("Failed to cancel booking id {} after {} retries due to concurrent modification", bookingId, MAX_RETRIES);
+                    throw new RuntimeException("Operation failed due to concurrent modification. Please try again.");
+                }
+                try {
+                    Thread.sleep(100 * attempt); // Exponential backoff
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Retry interrupted", ie);
+                }
             }
-        } catch (Exception e) {
-            logger.error("Error notifying owner of cancellation for booking ID: {}: {}", bookingId, e.getMessage());
         }
-        return mapToResponseDto(updatedBooking);
     }
 
 

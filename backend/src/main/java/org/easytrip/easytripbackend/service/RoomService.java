@@ -10,6 +10,7 @@ import org.easytrip.easytripbackend.model.User;
 import org.easytrip.easytripbackend.repository.BookingRepository;
 import org.easytrip.easytripbackend.repository.GuesthouseRepository;
 import org.easytrip.easytripbackend.repository.RoomRepository;
+import org.easytrip.easytripbackend.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +38,15 @@ public class RoomService {
     @Autowired
     private BookingRepository bookingRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Transactional
     public RoomResponseDTO createRoom(Long guesthouseId, RoomRequestDTO request){
         String email= SecurityContextHolder.getContext().getAuthentication().getName();
         logger.info("Creating a new room to guesthouse ID:{} by user:{}", guesthouseId, email);
-        User user =authService.findByEmail(email);
+        User user =userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
         if(!user.getRole().contains(Role.HOTEL_MANAGER)){
             logger.warn("User {} does not have the role HOTEL_MANAGER", email);
             throw new IllegalArgumentException("User " + email + " does not have the role HOTEL_MANAGER");
@@ -71,7 +76,7 @@ public class RoomService {
         room.setRoomNumber(request.getRoomNumber());
         room.setRoomType(request.getRoomType());
         room.setPricePerNight(request.getPricePerNight());
-        room.setAvailable(request.isAvailable());
+        room.setAvailable(true);
         room.setCapacity(request.getCapacity());
 
         Room savedRoom = roomRepository.save(room);

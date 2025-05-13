@@ -143,7 +143,7 @@ public class BusBookingService {
         User client = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Client not found"));
 
-        if (!client.getRole().contains(Role.BUS_OPERATOR)) {
+        if (!client.getRole().contains(Role.CLIENT)) {
             logger.error("User with email {} is not a CLIENT", email);
             throw new RuntimeException("User is not a client");
         }

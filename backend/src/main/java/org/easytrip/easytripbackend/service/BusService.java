@@ -152,23 +152,28 @@ public class BusService {
     public List<BusResponseDTO> searchBuses(String source, String destination) {
         logger.info("Searching buses by source: {} and destination: {}", source, destination);
         List<Bus> buses = busRepository.findByStatus(ApprovalStatus.APPROVED);
+        logger.debug("Found {} approved buses", buses.size());
 
         buses = buses.stream()
                 .filter(b -> b.getDepartureTime().isAfter(LocalDateTime.now()))
                 .collect(Collectors.toList());
+        logger.debug("After departure time filter, {} buses remain", buses.size());
 
         if (source != null && !source.isEmpty()) {
             buses = buses.stream()
                     .filter(b -> b.getSource().equalsIgnoreCase(source))
                     .collect(Collectors.toList());
+            logger.debug("After source filter ({}), {} buses remain", source, buses.size());
         }
 
         if (destination != null && !destination.isEmpty()) {
             buses = buses.stream()
                     .filter(b -> b.getDestination().equalsIgnoreCase(destination))
                     .collect(Collectors.toList());
+            logger.debug("After destination filter ({}), {} buses remain", destination, buses.size());
         }
 
+        logger.info("Returning {} buses", buses.size());
         return buses.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());

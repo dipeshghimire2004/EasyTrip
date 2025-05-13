@@ -9,6 +9,8 @@ import org.easytrip.easytripbackend.dto.BookingRequestDTO;
 import org.easytrip.easytripbackend.dto.BookingResponseDTO;
 import org.easytrip.easytripbackend.dto.BookingUpdateRequestDTO;
 import org.easytrip.easytripbackend.service.GuesthouseBookingService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,7 @@ import java.util.ConcurrentModificationException;
 @RequestMapping("/api/bookings")
 @Tag(name = "Booking API", description = "Endpoints for booking guesthouses")
 public class GuesthouseBookingController {
+    private static final Logger logger = LoggerFactory.getLogger(GuesthouseBookingController.class);
     @Autowired
     private GuesthouseBookingService guesthouseBookingService;
 
@@ -48,7 +51,7 @@ public class GuesthouseBookingController {
     }
 
 
-    @DeleteMapping("/{bookingId}")
+    @PutMapping("/{bookingId}/cancel")
     @PreAuthorize("hasRole('CLIENT')")
     @Operation(summary = "Cancel guesthouse booking", description = "Cancel a guesthouse booked by a traveler.")
     @ApiResponses(value = {
@@ -56,16 +59,16 @@ public class GuesthouseBookingController {
             @ApiResponse(responseCode = "400", description = "Invalid dates or guesthouse not approved"),
             @ApiResponse(responseCode = "403", description = "Forbidden - Requires CLIENT role")
     })
-    public ResponseEntity<BookingResponseDTO> cancelBooking(@PathVariable Long bookingId) {
-        BookingResponseDTO response= guesthouseBookingService.cancelBooking(bookingId);
-        return ResponseEntity.ok(response);
-    }
+    public void cancelBooking(@PathVariable Long bookingId) {
+        guesthouseBookingService.cancelBooking(bookingId);
+        logger.info("Successfully cancelled booking with id {}", bookingId);
+}
 
     @PutMapping("/{bookingId}")
     @PreAuthorize("hasRole('CLIENT')")
-    @Operation(summary = "Cancel guesthouse booking", description = "Cancel a guesthouse booked by a traveler.")
+    @Operation(summary = "Modify guesthouse booking", description = "Modify a guesthouse booked by a traveler.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Booking Cancelled successfully"),
+            @ApiResponse(responseCode = "200", description = "Booking Modify successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid dates or guesthouse not approved"),
             @ApiResponse(responseCode = "403", description = "Forbidden - Requires CLIENT role")
     })
