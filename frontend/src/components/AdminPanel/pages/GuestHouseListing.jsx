@@ -35,7 +35,6 @@ const GuestHouseListing = () => {
             <th className="p-3 text-left">Location</th>
             <th className="p-3 text-left">Description</th>
             <th className="p-3 text-left">Amenities</th>
-            <th className="p-3 text-left">Price Per Night</th>
             <th className="p-3 text-left">Status</th>
             <th className="p-3 text-left">Contact</th>
           </tr>
@@ -47,8 +46,15 @@ const GuestHouseListing = () => {
               <td className="p-3">{guesthouse.name}</td>
               <td className="p-3">{guesthouse.location}</td>
               <td className="p-3">{guesthouse.description}</td>
-              <td className="p-3">{guesthouse.amenities}</td>
-              <td className="p-3">${guesthouse.pricePerNight}</td>
+              <td className="p-3">
+                {
+                  Array.isArray(guesthouse.amenities)
+                    ? guesthouse.amenities.join(", ")
+                    : typeof guesthouse.amenities === "string"
+                    ? guesthouse.amenities.split(/[,;|]/).join(", ")
+                    : ""
+                }
+              </td>
               <td className="p-3">{guesthouse.status}</td>
               <td className="p-3">{guesthouse.contactDetails}</td>
             </tr>

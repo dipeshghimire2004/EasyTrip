@@ -4,18 +4,26 @@ import api from '../../../API/Api';
 export default function CreateBus() {
   const [form, setForm] = useState({
     name: '',
+    ownerName: '',
+    ownerPhone: '',
     busType: '',
     totalSeats: '',
-    verifiedDocumentImage: null
+    source: '',
+    destination: '',
+    departureTime: '',
+    arrivalTime: '',
+    verifiedDocument: null,
+    farePerSeat: ''  // Add farePerSeat to the state
   });
+
   const [loading, setLoading] = useState(false);
 
   const handleChange = e => {
-    if (e.target.name === 'verifiedDocumentImage') {
-      setForm({ ...form, verifiedDocumentImage: e.target.files[0] });
-    } else {
-      setForm({ ...form, [e.target.name]: e.target.value });
-    }
+    const { name, value, files } = e.target;
+    setForm(prev => ({
+      ...prev,
+      [name]: name === 'verifiedDocument' ? files[0] : value
+    }));
   };
 
   const handleSubmit = async e => {
@@ -23,26 +31,34 @@ export default function CreateBus() {
     setLoading(true);
 
     const formData = new FormData();
-    formData.append('name', form.name);
-    formData.append('busType', form.busType); // Ensure this matches your busType format, e.g., "AC_SLEEPER"
-    formData.append('totalSeats', form.totalSeats);
-    formData.append('verifiedDocumentImage', form.verifiedDocumentImage);
+    Object.entries(form).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
 
     try {
-      await api.post('/api/bus', formData, {
+      const response = await api.post('/api/buses/register', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
+
+      console.log('Server Response:', response); // 👈 Print the response here
       alert('Bus successfully created!');
       setForm({
         name: '',
+        ownerName: '',
+        ownerPhone: '',
         busType: '',
         totalSeats: '',
-        verifiedDocumentImage: null
+        source: '',
+        destination: '',
+        departureTime: '',
+        arrivalTime: '',
+        verifiedDocument: null,
+        farePerSeat: ''  // Reset farePerSeat
       });
     } catch (err) {
-      console.error(err);
+      console.error('Error:', err); // 👈 Keep this for debugging
       alert('Creation failed');
     } finally {
       setLoading(false);
@@ -53,30 +69,30 @@ export default function CreateBus() {
     <div className="max-w-lg mx-auto p-6 bg-white rounded-2xl shadow-lg">
       <h2 className="text-2xl font-semibold mb-4">Create New Bus</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {[ 
+          { name: 'name', placeholder: 'Bus Name' },
+          { name: 'ownerName', placeholder: 'Owner Name' },
+          { name: 'ownerPhone', placeholder: 'Owner Phone' },
+          { name: 'busType', placeholder: 'Bus Type (AC, NON_AC, SLEEPER)' },
+          { name: 'totalSeats', placeholder: 'Total Seats', type: 'number' },
+          { name: 'source', placeholder: 'Source Location' },
+          { name: 'destination', placeholder: 'Destination Location' },
+          { name: 'departureTime', placeholder: 'Departure Time', type: 'datetime-local' },
+          { name: 'arrivalTime', placeholder: 'Arrival Time', type: 'datetime-local' },
+          { name: 'farePerSeat', placeholder: 'Fare per Seat', type: 'number' } // Add farePerSeat input
+        ].map(({ name, placeholder, type = 'text' }) => (
+          <input
+            key={name}
+            name={name}
+            type={type}
+            value={form[name]}
+            onChange={handleChange}
+            placeholder={placeholder}
+            className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        ))}
         <input
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          placeholder="Bus Name"
-          className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-        <input
-          name="busType"
-          value={form.busType}
-          onChange={handleChange}
-          placeholder="Bus Type (e.g., AC_SLEEPER)"
-          className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-        <input
-          name="totalSeats"
-          type="number"
-          value={form.totalSeats}
-          onChange={handleChange}
-          placeholder="Total Seats"
-          className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-        <input
-          name="verifiedDocumentImage"
+          name="verifiedDocument"
           type="file"
           onChange={handleChange}
           className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"

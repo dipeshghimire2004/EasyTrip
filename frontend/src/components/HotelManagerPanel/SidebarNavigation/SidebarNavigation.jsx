@@ -11,7 +11,7 @@ export default function SidebarNavigation() {
           <li>
             <Link to="/HOTEL_MANAGER/dashboard">
               <h2 className="block text-gray-700 hover:text-blue-500">
-                Add Guesthouse
+                Dashboard
               </h2>
             </Link>
           </li>
@@ -19,6 +19,13 @@ export default function SidebarNavigation() {
             <Link to="/HOTEL_MANAGER/addGuestHouse">
               <h2 className="block text-gray-700 hover:text-blue-500">
                 Add Guesthouse
+              </h2>
+            </Link>
+          </li>
+          <li>
+            <Link to="/HOTEL_MANAGER/createRoom">
+              <h2 className="block text-gray-700 hover:text-blue-500">
+                Create Room
               </h2>
             </Link>
           </li>

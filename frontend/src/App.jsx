@@ -14,6 +14,7 @@ import BusSearch from "./components/ClientPanel/BusSearch/BusSearch";
 import BusBookingPayment from "./components/ClientPanel/BusBookingPayment/BusBookingPayment";
 import Payment from './components/ClientPanel/Payment/Payment';
 import MyBookings from "./components/ClientPanel/MyBooking/MyBookings";
+import FindRoom from "./components/Booking/Room/FindRoom";
 
 // Admin
 import AdminPanel from './components/AdminPanel/AdminPanel';
@@ -22,6 +23,7 @@ import AdminPanel from './components/AdminPanel/AdminPanel';
 import AddGuestHouseForm from "./components/HotelManagerPanel/AddGuesthouse/AddGuestHouseForm";
 import GuestHouseOverview from "./components/HotelManagerPanel/GuestHouseOverview/GuestHouseOverview";
 import GuestHouseDashboard from "./components/HotelManagerPanel/Dashboard/Dashboard";
+import CreateRoom from "./components/HotelManagerPanel/CreateRoom/CreateRoom";
 
 // Bus Owners
 import BusOwnerSignUp from "./components/Bus/BusOwnerSignUp/BusOwnerSignUp";
@@ -59,6 +61,7 @@ function App() {
         {/* User Routes */}
         <Route path="/CLIENT/signup" element={<Signup role="CLIENT" />} />
         <Route path="/CLIENT/login" element={<Login role="CLIENT" setUserRole={setUserRole} />} />
+        <Route path="/CLIENT/findRoom" element={<ProtectedRoute element={<FindRoom />} userRole={userRole} allowedRoles={["CLIENT"]} />} />
         <Route path="/CLIENT/payment" element={<ProtectedRoute element={<Payment />} userRole={userRole} allowedRoles={["CLIENT"]} />} />
         <Route path="/CLIENT/busPayment" element={<ProtectedRoute element={<BusBookingPayment />} userRole={userRole} allowedRoles={["CLIENT"]} />} />
         <Route path="/CLIENT/Booked" element={<ProtectedRoute element={<MyBookings />} userRole={userRole} allowedRoles={["CLIENT"]} />} />
@@ -73,6 +76,7 @@ function App() {
         <Route path="/HOTEL_MANAGER/dashboard" element={<ProtectedRoute element={<GuestHouseDashboard />} userRole={userRole} allowedRoles={["HOTEL_MANAGER"]} />} />
         <Route path="/HOTEL_MANAGER/addGuestHouse" element={<ProtectedRoute element={<AddGuestHouseForm />} userRole={userRole} allowedRoles={["HOTEL_MANAGER"]} />} />
         <Route path="/HOTEL_MANAGER/guestHouseOverview" element={<ProtectedRoute element={<GuestHouseOverview />} userRole={userRole} allowedRoles={["HOTEL_MANAGER"]} />} />
+        <Route path="/HOTEL_MANAGER/createRoom" element={<ProtectedRoute element={<CreateRoom />} userRole={userRole} allowedRoles={["HOTEL_MANAGER"]} />} />
 
         {/* BUS OPERATOR Routes */}
         <Route path="/BUS_OPERATOR/signup" element={<Signup role="BUS_OPERATOR" />} />

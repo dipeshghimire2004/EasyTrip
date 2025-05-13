@@ -4,7 +4,13 @@ import api from "../../API/Api"; // Import the Axios instance
 
 export default function Payment() {
   const location = useLocation();
-  const { startDate: initialStartDate, endDate: initialEndDate, pricePerNight, guesthousesid } = location.state || {};
+  const {
+    startDate: initialStartDate,
+    endDate: initialEndDate,
+    pricePerNight,
+    guesthousesid,
+    roomId, // ✅ Extracted roomId from location.state
+  } = location.state || {};
 
   const [isBooked, setIsBooked] = useState(false);
   const [isCancel, setIsCancel] = useState(false);
@@ -25,22 +31,17 @@ export default function Payment() {
   const handleConfirmBooking = async () => {
     setIsLoadingConfirm(true);
 
-    const numberOfDays = calculateNumberOfDays();
-    const totalPrice = calculateTotalPrice();
-
     const bookingData = {
       guesthouseId: guesthousesid,
+      roomId: roomId, // ✅ Included roomId in bookingData
       checkInDate: startDate,
       checkOutDate: endDate,
-      totalPrice: totalPrice,
     };
 
     try {
-      console.log(bookingData);
       const response = await api.post("/api/bookings", bookingData);
       if (response.status === 200) {
-        setBookingId(response.data.bookingId); // Save booking ID from the response
-        console.log("Booking ID saved:", response.data.bookingId); // Log after saving to ensure it's saved
+        setBookingId(response.data.bookingId);
         setIsBooked(true);
         setIsCancel(true);
         alert("Booking Confirmed! Thank you for choosing EasyTrip.");
@@ -63,7 +64,7 @@ export default function Payment() {
 
     setIsLoadingCancel(true);
     try {
-      const response = await api.delete(`/api/bookings/${bookingId}`); // Call the cancel API with the booking ID
+      const response = await api.delete(`/api/bookings/${bookingId}`);
       if (response.status === 200) {
         alert("Booking Canceled!");
         setIsCancel(false);
@@ -102,7 +103,9 @@ export default function Payment() {
       {!isBooked ? (
         <h1 className="text-2xl font-bold mb-4">Booking & Payment</h1>
       ) : (
-        <p className="text-green-600 text-xl font-bold mb-4">Booking Confirmed! Thank you for choosing EasyTrip.</p>
+        <p className="text-green-600 text-xl font-bold mb-4">
+          Booking Confirmed! Thank you for choosing EasyTrip.
+        </p>
       )}
 
       <div className="mb-4">
@@ -124,14 +127,18 @@ export default function Payment() {
           />
         </div>
         {startDate && endDate && new Date(startDate) >= new Date(endDate) && (
-          <p className="text-red-500 text-sm mt-1">End date must be after start date.</p>
+          <p className="text-red-500 text-sm mt-1">
+            End date must be after start date.
+          </p>
         )}
       </div>
 
       <div className="mb-4">
         <h2 className="font-bold">Total Price Breakdown</h2>
         <p>Base Price (per night): ${pricePerNight}</p>
-        <p>Duration: {numberOfDays} {numberOfDays === 1 ? 'night' : 'nights'}</p>
+        <p>
+          Duration: {numberOfDays} {numberOfDays === 1 ? "night" : "nights"}
+        </p>
         <p>Total Price: ${totalPrice}</p>
       </div>
 
@@ -141,7 +148,11 @@ export default function Payment() {
       </div>
 
       <button
-        className={`p-2 mb-2 rounded-md w-full ${isButtonDisabled || isBooked || isLoadingConfirm ? "bg-gray-400 cursor-not-allowed" : "bg-green-500 text-white"}`}
+        className={`p-2 mb-2 rounded-md w-full ${
+          isButtonDisabled || isBooked || isLoadingConfirm
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-green-500 text-white"
+        }`}
         onClick={handleConfirmBooking}
         disabled={isButtonDisabled || isBooked || isLoadingConfirm}
       >
@@ -149,7 +160,11 @@ export default function Payment() {
       </button>
 
       <button
-        className={`p-2 rounded-md w-full ${!isCancel || isButtonDisabled || isLoadingCancel ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 text-white"}`}
+        className={`p-2 rounded-md w-full ${
+          !isCancel || isButtonDisabled || isLoadingCancel
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-red-500 text-white"
+        }`}
         onClick={handleCancelBooking}
         disabled={!isCancel || isButtonDisabled || isLoadingCancel}
       >

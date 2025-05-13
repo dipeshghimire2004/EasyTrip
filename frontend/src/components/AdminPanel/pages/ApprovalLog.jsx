@@ -39,7 +39,7 @@ const ApprovalLog = ({ limit }) => {
   // Handle Reject button click
   const handleReject = async (id, name) => {
     try {
-      await api.post(`/api/guesthouses/${id}/reject`);
+      await api.post(`/api/guesthouses/.${id}/reject`);
       alert(`Rejected ${name}`);
       // Re-fetch data to update the table after rejection
       const response = await api.get("/api/guesthouses/admin/pending");
