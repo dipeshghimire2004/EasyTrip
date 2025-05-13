@@ -135,4 +135,13 @@ public class BusController {
     public ResponseEntity<List<BusBookingResponseDTO>> getClientBookings() {
         return ResponseEntity.ok(busBookingService.getClientBookings());
     }
+
+    @Operation(summary = "Get operator bookings", description = "Retrieve all bookings for buses operated by the authenticated bus operator")
+    @ApiResponse(responseCode = "200", description = "List of operator bookings",
+            content = @Content(schema = @Schema(implementation = BusBookingResponseDTO.class)))
+    @PreAuthorize("hasRole('BUS_OPERATOR')")
+    @GetMapping("/bookings/operator")
+    public ResponseEntity<List<BusBookingResponseDTO>> getOperatorBookings() {
+        return ResponseEntity.ok(busBookingService.getBusBookings());
+    }
 }

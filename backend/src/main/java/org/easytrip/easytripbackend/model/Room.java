@@ -41,5 +41,6 @@ public class Room {
     private int capacity;
 
     @Version
+    @Column(nullable=false)
     private Long version;
 }

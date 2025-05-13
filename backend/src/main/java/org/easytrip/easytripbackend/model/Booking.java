@@ -46,5 +46,6 @@ public class Booking {
     private String status ="CONFIRMED";// e.g., "CONFIRMED", "CANCELLED","MODIFIED"
 
     @Version
+    @Column(nullable = false)
     private Long version;
 }

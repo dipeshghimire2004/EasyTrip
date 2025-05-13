@@ -12,6 +12,9 @@ import java.util.List;
 public interface BusRepository extends JpaRepository<Bus, Long> {
     List<Bus> findByStatus(ApprovalStatus status);
 
+    @Query("SELECT b FROM Bus b WHERE b.operator.id = :operatorId")
+    List<Bus> findByOperatorId(@Param("operatorId") Long operatorId);
+
     @Query("SELECT b FROM Bus b WHERE b.status = :status AND b.departureTime > :now " +
             "AND (:source IS NULL OR LOWER(b.source) = LOWER(:source)) " +
             "AND (:destination IS NULL OR LOWER(b.destination) = LOWER(:destination))")

@@ -1,5 +1,6 @@
 package org.easytrip.easytripbackend.service;
 
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.OptimisticLockException;
 import org.easytrip.easytripbackend.dto.BookingRequestDTO;
 import org.easytrip.easytripbackend.dto.BookingResponseDTO;
@@ -195,38 +196,32 @@ public class GuesthouseBookingService {
 
     @Transactional
     public void cancelBooking(Long bookingId) {
-        int attempt = 0;
-        while (attempt < MAX_RETRIES) {
-            try {
-                Booking booking = bookingRepository.findById(bookingId)
-                        .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
-                if (!booking.getStatus().equals("CONFIRMED")) {
-                    throw new IllegalStateException("Only CONFIRMED bookings can be cancelled");
-                }
-                Room room = booking.getRoom();
-                room.setAvailable(true);
-                booking.setStatus("CANCELLED");
-                roomRepository.save(room);
-                bookingRepository.save(booking);
-                logger.info("Cancelled booking with id {}", bookingId);
-                return; // Success, exit the loop
-            } catch (OptimisticLockException e) {
-                attempt++;
-                logger.warn("Concurrent modification detected for booking id {}. Retry attempt {}/{}", bookingId, attempt, MAX_RETRIES);
-                if (attempt == MAX_RETRIES) {
-                    logger.error("Failed to cancel booking id {} after {} retries due to concurrent modification", bookingId, MAX_RETRIES);
-                    throw new RuntimeException("Operation failed due to concurrent modification. Please try again.");
-                }
-                try {
-                    Thread.sleep(100 * attempt); // Exponential backoff
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                    throw new RuntimeException("Retry interrupted", ie);
-                }
+        try {
+            // Fetch booking with pessimistic lock
+            Booking booking = bookingRepository.findById(bookingId, LockModeType.PESSIMISTIC_WRITE)
+                    .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
+            logger.info("Attempting to cancel booking id {} with status {} and room id {}",
+                    bookingId, booking.getStatus(), booking.getRoom().getId());
+
+            if (!booking.getStatus().equals("CONFIRMED")) {
+                throw new IllegalStateException("Only CONFIRMED bookings can be cancelled");
             }
+
+            // Fetch room with pessimistic lock
+            Room room = roomRepository.findById(booking.getRoom().getId(), LockModeType.PESSIMISTIC_WRITE)
+                    .orElseThrow(() -> new IllegalArgumentException("Room not found"));
+            logger.info("Room id {} availability before update: {}", room.getId(), room.isAvailable());
+
+            // Update entities
+            room.setAvailable(true);
+            booking.setStatus("CANCELLED");
+
+            logger.info("Cancelled booking with id {}, room availability set to true", bookingId);
+        } catch (Exception e) {
+            logger.error("Failed to cancel booking id {}: {}", bookingId, e.getMessage(), e);
+            throw new RuntimeException("Failed to cancel booking due to an unexpected error", e);
         }
     }
-
 
     public BookingResponseDTO modifyBooking(Long bookingId, BookingUpdateRequestDTO request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();

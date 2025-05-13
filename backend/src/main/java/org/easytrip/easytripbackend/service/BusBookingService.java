@@ -154,6 +154,29 @@ public class BusBookingService {
                 .collect(Collectors.toList());
     }
 
+    public List<BusBookingResponseDTO> getBusBookings() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        logger.info("Fetching bus bookings for email: {}", email);
+
+        User operator = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Owner not found"));
+        if (!operator.getRole().contains(Role.BUS_OPERATOR)) {
+            logger.error("User with email {} is not a BUS_OPERATOR", email);
+            throw new RuntimeException("User is not a BUS_OPERATOR");
+        }
+
+        List<Bus> buses = busRepository.findByOperatorId(operator.getId());
+        logger.debug("Found {} buses for opeator ID: {}", buses.size(), operator.getId());
+        List<Long> busIds = buses.stream().map(Bus::getId).collect(Collectors.toList());
+
+        List<BusBooking> bookings = busBookingRepository.findByBusIds(busIds);
+        logger.debug("Found {} bookings for operator ID: {}", bookings.size(), operator.getId());
+
+        return bookings.stream()
+                .map(this:: mapToResponse)
+                .collect(Collectors.toList());
+    }
+
     private BusBookingResponseDTO mapToResponse(BusBooking booking) {
         BusBookingResponseDTO response = new BusBookingResponseDTO();
         response.setId(booking.getId());
