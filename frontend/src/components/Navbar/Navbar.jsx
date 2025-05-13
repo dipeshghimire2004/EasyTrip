@@ -41,17 +41,17 @@ const Navbar = () => {
           {/* Desktop Buttons */}
           <div className="hidden md:flex md:space-x-4">
             <Link to="/CLIENT/login">
-              <button className="bg-transparent hover:bg-blue-500 border-1 border-gray-400 text-black hover:text-white font-bold px-5 py-2 rounded-full text-lg shadow-lg transition-all duration-300 ease-in-out">
+              <button className="bg-transparent hover:bg-blue-500 border-1 border-gray-400 text-black hover:text-white font-bold px-4 py-1 rounded-full text-sm lg:text-md shadow-lg transition-all duration-300 ease-in-out">
                 Traveler Login
               </button>
             </Link>
             <Link to="/HOTEL_MANAGER/login">
-              <button className="bg-transparent hover:bg-yellow-500 border-1 border-gray-400 text-black hover:text-white font-bold px-5 py-2 rounded-full text-lg shadow-lg transition-all duration-300 ease-in-out">
+              <button className="bg-transparent hover:bg-yellow-500 border-1 border-gray-400 text-black hover:text-white font-bold px-4 py-1 rounded-full text-sm lg:text-md shadow-lg transition-all duration-300 ease-in-out">
                 Guesthouse Login
               </button>
             </Link>
             <Link to="/BUS_OPERATOR/signup">
-              <button className="bg-transparent hover:bg-green-500 border-1 border-gray-400 text-black hover:text-white font-bold px-5 py-2 rounded-full text-lg shadow-lg transition-all duration-300 ease-in-out">
+              <button className="bg-transparent hover:bg-green-500 border-1 border-gray-400 text-black hover:text-white font-bold px-4 py-1 rounded-full text-sm lg:text-md shadow-lg transition-all duration-300 ease-in-out">
                 Bus Login
               </button>
             </Link>
@@ -71,18 +71,18 @@ const Navbar = () => {
                 Contact
               </Link>
               <Link to="/CLIENT/login">
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full text-lg w-full transition-all duration-300 ease-in-out">
-                  Traveler Login/Register
+                <button className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-2 rounded-full text-md w-full transition-all duration-300 ease-in-out">
+                  Traveler Login
                 </button>
               </Link>
               <Link to="/HOTEL_MANAGER/login">
-                <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full text-lg w-full transition-all duration-300 ease-in-out">
-                  Guesthouse Owner Login/Register
+                <button className="bg-green-600 hover:bg-green-700 text-white px-2 py-2 rounded-full text-md w-full transition-all duration-300 ease-in-out">
+                  Guesthouse Owner Login
                 </button>
               </Link>
               <Link to="/BUS_OPERATOR/signup">
-                <button className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-full text-lg w-full transition-all duration-300 ease-in-out">
-                  Bus Owner Login/Register
+                <button className="bg-yellow-600 hover:bg-yellow-700 text-white px-2 py-2 rounded-full text-md w-full transition-all duration-300 ease-in-out">
+                  Bus Owner Login
                 </button>
               </Link>
             </div>
